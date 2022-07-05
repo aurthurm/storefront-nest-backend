@@ -9,13 +9,14 @@ import * as bcrypt from 'bcrypt';
 import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
-
+import { EmailService } from 'src/providers/email/email.service';
 @Injectable()
 export class AuthService {
   SALT_ROUNS = 10;
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
+    private emailService: EmailService,
   ) {}
 
   async validateUser(username: string, pass: string): Promise<any> {
@@ -55,6 +56,7 @@ export class AuthService {
     updatedUser.lastPasswordReset = new Date();
     this.usersService.update(user._id, updatedUser);
     //send email to the user
+    this.emailService.sendEmail();
     console.log(resetUrl, user);
   }
 

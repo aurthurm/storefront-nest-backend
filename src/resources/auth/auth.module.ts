@@ -12,6 +12,7 @@ import { AuthController } from './auth.controller';
 import { UserService } from '../user/user.service';
 import { jwtConstants } from 'src/helpers/constants';
 import { JwtStrategy } from './jwt.strategy';
+import { EmailService } from 'src/providers/email/email.service';
 
 @Module({
   imports: [
@@ -22,8 +23,8 @@ import { JwtStrategy } from './jwt.strategy';
       signOptions: { expiresIn: '16h' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy],
+  providers: [AuthService, EmailService, LocalStrategy, JwtStrategy],
   controllers: [AuthController],
-  exports: [AuthService],
+  exports: [AuthService, EmailService],
 })
 export class AuthModule {}
