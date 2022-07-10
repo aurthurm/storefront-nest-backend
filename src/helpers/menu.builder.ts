@@ -8,6 +8,10 @@ export default class BotMenuBuilder {
     private validation: string,
     private validationResponse: string,
     private expectedResponses: any[],
+    private isValidResponse: boolean = false,
+    private action: any = function (action) {
+      action;
+    },
   ) {}
 
   addOption(option: string): void {
@@ -34,6 +38,11 @@ export default class BotMenuBuilder {
     this.previous = value;
   }
 
+  setIsValidResponse(isValid: boolean) {
+    this.isValidResponse = isValid;
+    return this;
+  }
+
   get Previous(): string {
     return this.previous;
   }
@@ -58,8 +67,24 @@ export default class BotMenuBuilder {
     return this.expectedResponses;
   }
 
+  setAction(action: any) {
+    this.action = action;
+    return this;
+  }
+
+  get Action(): any {
+    return this.action;
+  }
+
+  exec() {
+    this.action();
+    return this;
+  }
+
   build(): string {
-    return this.title + ' \n' + this.options.join(' \n');
+    return this.title + ' \n' + this.options.join(' \n') + !this.isValidResponse
+      ? this.validationResponse
+      : '';
   }
 
   get() {

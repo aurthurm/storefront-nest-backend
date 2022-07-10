@@ -1,3 +1,4 @@
+import { BotMenuModule } from './resources/bot-menu/bot-menu.module';
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -11,10 +12,11 @@ import { AuthModule } from './resources/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './resources/auth/roles.guard';
 import { EmailService } from './providers/email/email.service';
+import { BotModule } from './resources/bot/bot.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://192.168.122.185/storefront'),
+    MongooseModule.forRoot('mongodb://localhost/storefront'),
     MailerModule.forRoot({
       transport: {
         host: 'localhost',
@@ -40,6 +42,8 @@ import { EmailService } from './providers/email/email.service';
     }),
     AuthModule,
     UserModule,
+    BotModule,
+    BotMenuModule,
   ],
   controllers: [AppController],
   providers: [

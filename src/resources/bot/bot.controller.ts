@@ -1,4 +1,4 @@
-import { Controller, All, Req } from '@nestjs/common';
+import { Controller, All, Req, Post } from '@nestjs/common';
 import { Request } from 'express';
 import { BotService } from './bot.service';
 
@@ -6,7 +6,7 @@ import { BotService } from './bot.service';
 export class BotController {
   constructor(private readonly botService: BotService) {}
 
-  @All()
+  @Post()
   create(@Req() request: Request) {
     const { source, message } = request.body;
     return this.botService.getWhatsAppResponse(source, message);
