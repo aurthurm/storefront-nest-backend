@@ -7,8 +7,8 @@ export class BotController {
   constructor(private readonly botService: BotService) {}
 
   @Post()
-  create(@Req() request: Request) {
+  async create(@Req() request: Request) {
     const { source, message } = request.body;
-    return this.botService.getWhatsAppResponse(source, message);
+    return await this.botService.getWhatsAppResponse(source, message);
   }
 }

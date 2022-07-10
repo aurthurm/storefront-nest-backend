@@ -1,1 +1,23 @@
-export class CreateBotDto {}
+import { ApiProperty } from '@nestjs/swagger';
+
+export class CreateBotDto {
+  @ApiProperty()
+  source: string;
+
+  @ApiProperty()
+  previousMenu: string;
+
+  @ApiProperty()
+  currentMenu: string;
+
+  @ApiProperty()
+  nextMenu: string;
+
+  @ApiProperty({ enum: ['pending', 'closed'] })
+  status: string;
+
+  @ApiProperty({
+    default: true,
+  })
+  menuLock: boolean;
+}

@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
@@ -6,7 +6,6 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
-import { Request } from 'express';
 
 @Injectable()
 export class UserService {
@@ -24,6 +23,12 @@ export class UserService {
     return createUser.save();
   }
 
+  createBotAccount(source: string) {
+    const createUser = new this.userModel();
+    createUser.waBotPhone = source;
+    return createUser.save();
+  }
+
   async findAll(query = {}) {
     console.log(query);
     return await this.userModel.find(query).exec();
@@ -37,6 +42,14 @@ export class UserService {
     return await this.userModel
       .findOne({
         $or: [{ phone: payload }, { email: payload }],
+      })
+      .lean();
+  }
+
+  async getUserBySource(source: string) {
+    return await this.userModel
+      .findOne({
+        waBotPhone: source,
       })
       .lean();
   }

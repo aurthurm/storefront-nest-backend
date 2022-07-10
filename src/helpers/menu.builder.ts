@@ -8,7 +8,7 @@ export default class BotMenuBuilder {
     private validation: string,
     private validationResponse: string,
     private expectedResponses: any[],
-    private isValidResponse: boolean = false,
+    private isValidResponse: boolean = true,
     private action: any = function (action) {
       action;
     },
@@ -82,9 +82,13 @@ export default class BotMenuBuilder {
   }
 
   build(): string {
-    return this.title + ' \n' + this.options.join(' \n') + !this.isValidResponse
-      ? this.validationResponse
-      : '';
+    return (
+      this.title +
+      ' \n' +
+      this.options.join(' \n') +
+      ' \n' +
+      ((!this.isValidResponse ? this.validationResponse : '') ?? '')
+    );
   }
 
   get() {

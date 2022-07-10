@@ -26,6 +26,9 @@ export class CreateUserDto {
   phone: string;
 
   @ApiProperty()
+  waBotPhone: string;
+
+  @ApiProperty()
   firstName: string;
 
   @ApiProperty()
@@ -51,4 +54,16 @@ export class CreateUserDto {
 
   @ApiProperty()
   address: string;
+
+  @ApiProperty()
+  createdBy: string;
+
+  @ApiProperty({
+    minimum: 1,
+    maximum: 100,
+  })
+  completeness: number;
+
+  @ApiProperty()
+  botActive: boolean;
 }

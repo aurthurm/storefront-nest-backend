@@ -40,6 +40,11 @@ export class User {
   })
   phone: string;
 
+  @Prop({
+    unique: true,
+  })
+  waBotPhone: string;
+
   @Prop()
   firstName: string;
 
@@ -69,6 +74,20 @@ export class User {
 
   @Prop()
   address: string;
+
+  @Prop()
+  createdBy: string;
+
+  @Prop({
+    min: 1,
+    max: 100,
+  })
+  completeness: number;
+
+  @Prop({
+    default: false,
+  })
+  botActive: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

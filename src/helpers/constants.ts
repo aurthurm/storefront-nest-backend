@@ -11,8 +11,14 @@ export enum Role {
 }
 
 export const EnTranslations = {
-  LISTING_INIT_MESSAGE:
-    'Thank you for Subscribing for StoreFront Services please sent the message “Hi” to activate the Main Menu',
+  LISTING_INIT_MESSAGE: {
+    title: 'Thank you for Subscribing for StoreFront Services ',
+    options: ['Please send the message “Hi” to activate the Main Menu'],
+    validation: '',
+    validationResponse: 'Invalid Response',
+    expectedResponses: ['Hi'],
+  },
+
   REGISTRATION_MENU: {
     title: ' Welcome to StoreFront Services \nRegistration Menu',
     options: [

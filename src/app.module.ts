@@ -1,4 +1,3 @@
-import { BotMenuModule } from './resources/bot-menu/bot-menu.module';
 import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
@@ -43,7 +42,6 @@ import { BotModule } from './resources/bot/bot.module';
     AuthModule,
     UserModule,
     BotModule,
-    BotMenuModule,
   ],
   controllers: [AppController],
   providers: [

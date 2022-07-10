@@ -21,6 +21,11 @@ export class Bot {
 
   @Prop({ enum: ['pending', 'closed'] })
   status: string;
+
+  @Prop({
+    default: true,
+  })
+  menuLock: boolean;
 }
 
 export const BotSchema = SchemaFactory.createForClass(Bot);
