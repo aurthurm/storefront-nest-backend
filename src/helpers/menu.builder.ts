@@ -2,9 +2,9 @@ export default class BotMenuBuilder {
   constructor(
     private title: string,
     private options: string[],
+    private previous: string,
     private current: string,
     private next: string,
-    private previous: string,
     private validation: string,
     private validationResponse: string,
     private expectedResponses: any[],

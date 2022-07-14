@@ -31,4 +31,25 @@ export const EnTranslations = {
     validationResponse: 'Please choose one of the following options: 1,2,3,4',
     expectedResponses: [1, 2, 3, 4],
   },
+  MAIN_MENU: {
+    title: 'Main Menu',
+    options: [
+      '1. View My Listings',
+      '2. Remove / Delete Listing/s',
+      '3. Change Reminder Frequency',
+      '4. Ternant Services\n\ta. Create Tenant\n\tb. Confirm Tenant\n\tc. Check My Tenant Status\n\td. Tenant Clearing Check\n\te. Blacklist / Un=blacklist Tenant.',
+      '5. End / Terminate Lease Subscribe',
+      '6. Support',
+    ],
+    validation: '',
+    validationResponse: 'Please choose one of the following options: 1,2,3,4,a,b,c,d,e,5,6',
+    expectedResponses: [1, 2, 3, "a", "b", "c", "d", "e", 5, 6],
+  },
+  TERMINATE_BOT: {
+    title: 'Thank you for using StoreFront Services ',
+    options: [],
+    validation: '',
+    validationResponse: '',
+    expectedResponses: [''],
+  },
 };

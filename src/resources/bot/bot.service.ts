@@ -1,15 +1,20 @@
 import { UpdateBotDto } from './dto/update-bot.dto';
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EnTranslations } from 'src/helpers/constants';
 import BotMenuBuilder from 'src/helpers/menu.builder';
 import { Bot } from './entities/bot.entity';
+import { BotAccountService } from 'src/providers/bot-account/bot-account.service';
+
 
 @Injectable()
 export class BotService {
   source = '';
-  constructor(@InjectModel(Bot.name) private readonly botModel: Model<Bot>) {}
+  isUserRegistered = false;
+  menu: BotMenuBuilder = null;
+  constructor(@InjectModel(Bot.name) private readonly botModel: Model<Bot>, 
+   private botAccountService: BotAccountService) { }
   //
 
   async getWhatsAppResponse(source: string, message: string) {
@@ -21,35 +26,44 @@ export class BotService {
   async botManager(source: string, message: string) {
     //check if its the init message
     const botSession = await this.getCurrentSession(source);
-    if (!botSession) {
+    if (botSession === null) {
+      // Is user registered?
+      const account = await this.botAccountService.checkIfAccountExists(source);
+      console.log(account);
+
+      if(account === null){
+
+      } else {}
+
+      this.menu = this.menuResolver('init');
       const bot = new Bot();
       bot.source = source;
       bot.status = 'pending';
-      bot.currentMenu = this.menuResolver('init').Current;
-      bot.nextMenu = this.menuResolver('init').Next;
-      bot.previousMenu = this.menuResolver('init').Previous;
+      bot.currentMenu = this.menu.Current;
+      bot.nextMenu ='main' //account? (account?.botActive ? 'main': 'terminate'): 'registration';
+      bot.previousMenu = this.menu.Previous;
+      bot.menuLock = true;
       await this.create(bot);
-      return this.menuResolver(bot.currentMenu).exec().build();
+      return this.menu.exec().build();
     }
-    const menu = this.menuResolver(botSession.currentMenu);
-    let isValidResponse = true;
-    if (botSession.menuLock)
-      isValidResponse = this.validateMenuResponse(menu.Current, message);
-
+    this.menu = this.menuResolver(botSession.currentMenu);
+    const isValidResponse = this.validateMenuResponse(message);
     if (isValidResponse) {
-      //   moveBotCursor(prevStage, currentStage, nextStage)
-      this.moveBotCursor(menu.Current, menu.Next, null);
-      console.log('Next Menu', menu.Next);
-      return this.menuResolver(menu.Next).exec().build();
-    } else {
-      return this.menuResolver(menu.Current)
-        .setIsValidResponse(isValidResponse)
+      await this.moveBotCursor(this.menu.Current, this.menu.Next, null);
+      // console.log('Next Menu', menu.Next);
+      return this.menuResolver(this.menu.Next??'terminate').exec().build();
+    }
+    else {
+      return this.menuResolver(this.menu.Current)
+        .setIsValidResponse(false)
         .build();
     }
   }
 
   menuResolver(stage: string) {
+  
     switch (stage) {
+
       case 'init': {
         const {
           title,
@@ -58,20 +72,22 @@ export class BotService {
           validationResponse,
           expectedResponses,
         } = EnTranslations.LISTING_INIT_MESSAGE;
+
+        const nextMenu = 'main';//this.isUserRegistered?'terminate':'registration';
         return new BotMenuBuilder(
           title,
           options,
-          'init',
-          'registration',
           null,
+          'init',
+          nextMenu,
           validation,
           validationResponse,
           expectedResponses,
         )
           .get()
-          .setAction(() => {});
+          .setAction(() => { });
       }
-
+      
       case 'registration': {
         const {
           title,
@@ -84,8 +100,32 @@ export class BotService {
           title,
           options,
           'init',
+          'registration',
+          null,
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((message: string) => {
+            console.log('Action fired', message);
+          });
+      }
+      
+      case 'main': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.MAIN_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
           'init',
-          '1',
+          'main',
+          null,
           validation,
           validationResponse,
           expectedResponses,
@@ -96,20 +136,47 @@ export class BotService {
           });
       }
 
+      case 'terminate': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.TERMINATE_BOT;
+        return new BotMenuBuilder(
+          title,
+          options,
+          null,
+          null,
+          null,
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (message: string) => {
+            console.log('terminate Action fired', message); const { _id } = (await this.getCurrentSession(this.source)) as any;
+            return this.updateSession(_id, {
+              status: "closed",
+              menuLock: false,
+            });
+          });
+      }
+
       default:
-        return this.menuResolver('init');
+        
     }
   }
 
-  validateMenuResponse(stage: string, message: string) {
-    const menu = this.menuResolver(stage);
-    const matched = menu.ExpectedResponses.filter((resp: any) => {
+  validateMenuResponse(message: string) {
+    const matched = this.menu.ExpectedResponses.filter((resp: any) => {
       return resp.toString().toLowerCase() === message.toLowerCase();
     });
     if (matched.length > 0) {
       return true;
     }
-    return message.match(`/${menu.Validation}/ig`) !== null;
+    return message.match(`/${this.menu.Validation}/ig`) !== null;
   }
 
   create(bot: Bot) {
@@ -117,7 +184,7 @@ export class BotService {
   }
 
   getCurrentSession(source: string): Promise<Bot> {
-    return this.botModel.findOne({ source: source, status: 'pending' }).exec();
+    return this.botModel.findOne({ source: source, status: 'pending' }).lean().exec();
   }
   updateSession(id: string, payload = {}) {
     return this.botModel.findByIdAndUpdate(id, payload);
