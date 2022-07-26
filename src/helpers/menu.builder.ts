@@ -5,7 +5,7 @@ export default class BotMenuBuilder {
     private previous: string,
     private current: string,
     private next: string,
-    private validation: string,
+    private validation: RegExp,
     private validationResponse: string,
     private expectedResponses: any[],
     private isValidResponse: boolean = true,
@@ -55,7 +55,7 @@ export default class BotMenuBuilder {
     return this.current;
   }
 
-  get Validation(): string {
+  get Validation(): RegExp {
     return this.validation;
   }
 

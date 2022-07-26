@@ -1,5 +1,4 @@
-import { UpdateBotDto } from './dto/update-bot.dto';
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { EnTranslations } from 'src/helpers/constants';
@@ -7,14 +6,15 @@ import BotMenuBuilder from 'src/helpers/menu.builder';
 import { Bot } from './entities/bot.entity';
 import { BotAccountService } from 'src/providers/bot-account/bot-account.service';
 
-
 @Injectable()
 export class BotService {
   source = '';
   isUserRegistered = false;
   menu: BotMenuBuilder = null;
-  constructor(@InjectModel(Bot.name) private readonly botModel: Model<Bot>, 
-   private botAccountService: BotAccountService) { }
+  constructor(
+    @InjectModel(Bot.name) private readonly botModel: Model<Bot>,
+    private botAccountService: BotAccountService,
+  ) {}
   //
 
   async getWhatsAppResponse(source: string, message: string) {
@@ -29,31 +29,37 @@ export class BotService {
     if (botSession === null) {
       // Is user registered?
       const account = await this.botAccountService.checkIfAccountExists(source);
-      console.log(account);
+      let nextMenu = '3';
+      if (account) {
+        nextMenu = '2';
+        if (!account.botActive) nextMenu = '4';
+      }
 
-      if(account === null){
+      this.menu = this.menuResolver('1');
 
-      } else {}
-
-      this.menu = this.menuResolver('init');
       const bot = new Bot();
       bot.source = source;
       bot.status = 'pending';
       bot.currentMenu = this.menu.Current;
-      bot.nextMenu ='main' //account? (account?.botActive ? 'main': 'terminate'): 'registration';
+      bot.nextMenu = nextMenu;
       bot.previousMenu = this.menu.Previous;
       bot.menuLock = true;
       await this.create(bot);
+      this.menu.Current = nextMenu;
+
       return this.menu.exec().build();
     }
     this.menu = this.menuResolver(botSession.currentMenu);
     const isValidResponse = this.validateMenuResponse(message);
     if (isValidResponse) {
-      await this.moveBotCursor(this.menu.Current, this.menu.Next, null);
-      // console.log('Next Menu', menu.Next);
-      return this.menuResolver(this.menu.Next??'terminate').exec().build();
-    }
-    else {
+      let nextMenu = this.menu.Next ?? botSession.nextMenu;
+
+      if (nextMenu === null) {
+        nextMenu = botSession.currentMenu + `.${message}.1`;
+      }
+      await this.moveBotCursor(botSession.currentMenu, nextMenu, null);
+      return this.menuResolver(nextMenu).exec().build();
+    } else {
       return this.menuResolver(this.menu.Current)
         .setIsValidResponse(false)
         .build();
@@ -61,10 +67,8 @@ export class BotService {
   }
 
   menuResolver(stage: string) {
-  
     switch (stage) {
-
-      case 'init': {
+      case '1': {
         const {
           title,
           options,
@@ -73,46 +77,22 @@ export class BotService {
           expectedResponses,
         } = EnTranslations.LISTING_INIT_MESSAGE;
 
-        const nextMenu = 'main';//this.isUserRegistered?'terminate':'registration';
         return new BotMenuBuilder(
           title,
           options,
           null,
-          'init',
-          nextMenu,
-          validation,
-          validationResponse,
-          expectedResponses,
-        )
-          .get()
-          .setAction(() => { });
-      }
-      
-      case 'registration': {
-        const {
-          title,
-          options,
-          validation,
-          validationResponse,
-          expectedResponses,
-        } = EnTranslations.REGISTRATION_MENU;
-        return new BotMenuBuilder(
-          title,
-          options,
-          'init',
-          'registration',
+          '1',
           null,
           validation,
           validationResponse,
           expectedResponses,
         )
           .get()
-          .setAction((message: string) => {
-            console.log('Action fired', message);
+          .setAction(() => {
+            //
           });
       }
-      
-      case 'main': {
+      case '2': {
         const {
           title,
           options,
@@ -123,8 +103,8 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          'init',
-          'main',
+          '1',
+          '2',
           null,
           validation,
           validationResponse,
@@ -135,8 +115,127 @@ export class BotService {
             console.log('Action fired', message);
           });
       }
+      case '3': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.REGISTRATION_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '1',
+          '3',
+          null,
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((message: string) => {
+            console.log('Action fired', message);
+          });
+      }
+      // Get PHONE
+      case '3.2.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_PHONE_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3',
+          '3.2.1',
+          '3.2.2',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((message: string) => {
+            console.log('Action fired', message);
+          });
+      }
+      // Confirm PHONE
+      case '3.2.2': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.CONFIRM_PHONE_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3.2.1',
+          '3.2.2',
+          '3.2.3',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((message: string) => {
+            console.log('Action fired', message);
+          });
+      }
 
-      case 'terminate': {
+      case '3.2.3': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_PIN_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3.2.2',
+          '3.2.3',
+          '3.2.4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((message: string) => {
+            console.log('Action fired', message);
+          });
+      }
+
+      case '3.2.4': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.CONFIRM_PIN_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3.2.3',
+          '3.2.4',
+          '4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((message: string) => {
+            console.log('Action fired', message);
+          });
+      }
+
+      case '4': {
         const {
           title,
           options,
@@ -156,16 +255,16 @@ export class BotService {
         )
           .get()
           .setAction(async (message: string) => {
-            console.log('terminate Action fired', message); const { _id } = (await this.getCurrentSession(this.source)) as any;
+            console.log('4 Action fired', message);
+            const { _id } = (await this.getCurrentSession(this.source)) as any;
             return this.updateSession(_id, {
-              status: "closed",
+              status: 'closed',
               menuLock: false,
             });
           });
       }
 
       default:
-        
     }
   }
 
@@ -176,7 +275,7 @@ export class BotService {
     if (matched.length > 0) {
       return true;
     }
-    return message.match(`/${this.menu.Validation}/ig`) !== null;
+    return this.menu.Validation.test(message);
   }
 
   create(bot: Bot) {
@@ -184,16 +283,19 @@ export class BotService {
   }
 
   getCurrentSession(source: string): Promise<Bot> {
-    return this.botModel.findOne({ source: source, status: 'pending' }).lean().exec();
+    return this.botModel
+      .findOne({ source: source, status: 'pending' })
+      .lean()
+      .exec();
   }
   updateSession(id: string, payload = {}) {
     return this.botModel.findByIdAndUpdate(id, payload);
   }
 
-  async moveBotCursor(prevMenu, currentMenu, nextMenu) {
+  async moveBotCursor(previousMenu, currentMenu, nextMenu) {
     const { _id } = (await this.getCurrentSession(this.source)) as any;
     return this.updateSession(_id, {
-      prevMenu,
+      previousMenu,
       currentMenu,
       nextMenu,
       menuLock: false,
