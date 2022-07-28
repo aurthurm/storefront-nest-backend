@@ -1,3 +1,5 @@
+import { IBotActionResponse } from 'src/models/bot_action.model';
+
 export default class BotMenuBuilder {
   constructor(
     private title: string,
@@ -10,7 +12,7 @@ export default class BotMenuBuilder {
     private expectedResponses: any[],
     private isValidResponse: boolean = true,
     private action: any = function (action) {
-      action;
+      return action;
     },
   ) {}
 
@@ -76,9 +78,8 @@ export default class BotMenuBuilder {
     return this.action;
   }
 
-  exec() {
-    this.action();
-    return this;
+  exec(value: any): IBotActionResponse {
+    return this.action(value);
   }
 
   build(): string {

@@ -14,7 +14,7 @@ export const EnTranslations = {
   LISTING_INIT_MESSAGE: {
     title: 'Thank you for Subscribing for StoreFront Services ',
     options: ['Please send the message “Hi” to activate the Main Menu'],
-    validation: new RegExp(/^/),
+    validation: new RegExp(/^hi$/),
     validationResponse: 'Invalid Response',
     expectedResponses: ['Hi'],
     children: [],
@@ -28,7 +28,7 @@ export const EnTranslations = {
       '3. Change Account Number',
       '4. Support',
     ],
-    validation: new RegExp(/^/),
+    validation: new RegExp(/^[1-4]{1}$/),
     validationResponse: 'Please choose one of the following options: 1,2,3,4',
     expectedResponses: [1, 2, 3, 4],
     children: ['3.0', '3.1', '3.2', '3.3'],
@@ -83,7 +83,7 @@ export const EnTranslations = {
       '5. End / Terminate Lease Subscribe',
       '6. Support',
     ],
-    validation: new RegExp(/^/),
+    validation: new RegExp(/^[1-6|a|b|c|c|d|e]{1}$/),
     validationResponse:
       'Please choose one of the following options: 1,2,3,4,a,b,c,d,e,5,6',
     expectedResponses: [1, 2, 3, 'a', 'b', 'c', 'd', 'e', 5, 6],

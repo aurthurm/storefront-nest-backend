@@ -13,6 +13,9 @@ export class CreateBotDto {
   @ApiProperty()
   nextMenu: string;
 
+  @ApiProperty()
+  responses: any;
+
   @ApiProperty({ enum: ['pending', 'closed'] })
   status: string;
 

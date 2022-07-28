@@ -43,11 +43,11 @@ export class BotService {
       bot.currentMenu = this.menu.Current;
       bot.nextMenu = nextMenu;
       bot.previousMenu = this.menu.Previous;
+      bot.responses = { greetings: message };
       bot.menuLock = true;
       await this.create(bot);
       this.menu.Current = nextMenu;
-
-      return this.menu.exec().build();
+      return this.menu.build();
     }
     this.menu = this.menuResolver(botSession.currentMenu);
     const isValidResponse = this.validateMenuResponse(message);
@@ -57,8 +57,18 @@ export class BotService {
       if (nextMenu === null) {
         nextMenu = botSession.currentMenu + `.${message}.1`;
       }
-      await this.moveBotCursor(botSession.currentMenu, nextMenu, null);
-      return this.menuResolver(nextMenu).exec().build();
+
+      // fire relative action
+      const response = await this.menu.exec(message);
+      console.log(response);
+
+      if (response.success) {
+        //Update session to progress to the next menu
+        await this.moveBotCursor(botSession.currentMenu, nextMenu, null);
+        //return next menu
+        return this.menuResolver(nextMenu).build();
+      }
+      return this.menuResolver(botSession.currentMenu).build();
     } else {
       return this.menuResolver(this.menu.Current)
         .setIsValidResponse(false)
@@ -89,7 +99,10 @@ export class BotService {
         )
           .get()
           .setAction(() => {
-            //
+            return {
+              success: true,
+              message: '',
+            };
           });
       }
       case '2': {
@@ -135,7 +148,10 @@ export class BotService {
         )
           .get()
           .setAction((message: string) => {
-            console.log('Action fired', message);
+            return {
+              success: true,
+              message: '',
+            };
           });
       }
       // Get PHONE
@@ -158,8 +174,13 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((message: string) => {
-            console.log('Action fired', message);
+          .setAction((source: string) => {
+            console.log('Save phone to account', source);
+            this.updateBotSession({ 'responses.get_phone': source });
+            return {
+              success: true,
+              message: '',
+            };
           });
       }
       // Confirm PHONE
@@ -182,8 +203,15 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((message: string) => {
-            console.log('Action fired', message);
+          .setAction(async (source: string) => {
+            console.log('Confirm Number fired', source);
+            this.updateBotSession({ 'responses.confirmed_phone': source });
+            const success = await this.confirmNumber(source);
+            if (success) this.botAccountService.createAccount(source);
+            return {
+              success,
+              message: '',
+            };
           });
       }
 
@@ -206,8 +234,9 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((message: string) => {
-            console.log('Action fired', message);
+          .setAction((pin: string) => {
+            console.log('Get Pin fired', pin);
+            this.updateBotSession({ 'responses.get_pin': pin });
           });
       }
 
@@ -230,8 +259,9 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((message: string) => {
-            console.log('Action fired', message);
+          .setAction((pin: string) => {
+            console.log('Confirm Pin fired', pin);
+            this.updateBotSession({ 'responses.confirmed_pin': pin });
           });
       }
 
@@ -272,6 +302,7 @@ export class BotService {
     const matched = this.menu.ExpectedResponses.filter((resp: any) => {
       return resp.toString().toLowerCase() === message.toLowerCase();
     });
+    console.log(matched);
     if (matched.length > 0) {
       return true;
     }
@@ -300,5 +331,15 @@ export class BotService {
       nextMenu,
       menuLock: false,
     });
+  }
+
+  async updateBotSession(query: any) {
+    const { _id } = (await this.getCurrentSession(this.source)) as any;
+    return this.updateSession(_id, query);
+  }
+
+  async confirmNumber(source: string): Promise<boolean> {
+    const { responses } = (await this.getCurrentSession(this.source)) as any;
+    return responses['get_phone'] === source;
   }
 }

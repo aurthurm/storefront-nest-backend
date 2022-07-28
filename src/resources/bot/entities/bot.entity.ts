@@ -19,6 +19,9 @@ export class Bot {
   @Prop()
   nextMenu: string;
 
+  @Prop({ type: Object })
+  responses: any;
+
   @Prop({ enum: ['pending', 'closed'] })
   status: string;
 
