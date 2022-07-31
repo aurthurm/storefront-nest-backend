@@ -20,8 +20,9 @@ export default class BotMenuBuilder {
     this.options.push(option);
   }
 
-  set Title(title: string) {
+  setTitle(title: string) {
     this.title = title;
+    return this;
   }
 
   get Title(): string {
@@ -40,13 +41,13 @@ export default class BotMenuBuilder {
     this.previous = value;
   }
 
+  get Previous(): string {
+    return this.previous;
+  }
+
   setIsValidResponse(isValid: boolean) {
     this.isValidResponse = isValid;
     return this;
-  }
-
-  get Previous(): string {
-    return this.previous;
   }
 
   set Current(value: string) {
@@ -63,6 +64,11 @@ export default class BotMenuBuilder {
 
   get ValidationResponse(): string {
     return this.validationResponse;
+  }
+
+  setValidationResponse(value: string) {
+    this.validationResponse = value;
+    return this;
   }
 
   get ExpectedResponses(): any[] {

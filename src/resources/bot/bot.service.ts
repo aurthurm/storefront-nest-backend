@@ -25,6 +25,7 @@ export class BotService {
 
   async botManager(source: string, message: string) {
     //check if its the init message
+    const responses = {};
     const botSession = await this.getCurrentSession(source);
     if (botSession === null) {
       // Is user registered?
@@ -32,7 +33,13 @@ export class BotService {
       let nextMenu = '3';
       if (account) {
         nextMenu = '2';
-        if (!account.botActive) nextMenu = '4';
+        if (!account.botActive) {
+          nextMenu = '4';
+          if (account.status == 'confirm') {
+            responses['get_phone'] = account.waBotPhone;
+            nextMenu = '3.2.2';
+          }
+        }
       }
 
       this.menu = this.menuResolver('1');
@@ -43,14 +50,16 @@ export class BotService {
       bot.currentMenu = this.menu.Current;
       bot.nextMenu = nextMenu;
       bot.previousMenu = this.menu.Previous;
-      bot.responses = { greetings: message };
+      bot.responses = { greetings: message, ...responses };
       bot.menuLock = true;
       await this.create(bot);
       this.menu.Current = nextMenu;
       return this.menu.build();
     }
+
     this.menu = this.menuResolver(botSession.currentMenu);
     const isValidResponse = this.validateMenuResponse(message);
+
     if (isValidResponse) {
       let nextMenu = this.menu.Next ?? botSession.nextMenu;
 
@@ -60,16 +69,21 @@ export class BotService {
 
       // fire relative action
       const response = await this.menu.exec(message);
-      console.log(response);
 
       if (response.success) {
-        //Update session to progress to the next menu
+        // Update session to progress to the next menu
         await this.moveBotCursor(botSession.currentMenu, nextMenu, null);
         //return next menu
         return this.menuResolver(nextMenu).build();
       }
-      return this.menuResolver(botSession.currentMenu).build();
+
+      return this.menuResolver(botSession.currentMenu)
+        .setIsValidResponse(false)
+        .setValidationResponse(response?.message)
+        .build();
+      //
     } else {
+      // If response message is Invalid
       return this.menuResolver(this.menu.Current)
         .setIsValidResponse(false)
         .build();
@@ -78,6 +92,7 @@ export class BotService {
 
   menuResolver(stage: string) {
     switch (stage) {
+      // LISTING_INIT_MESSAGE
       case '1': {
         const {
           title,
@@ -105,6 +120,8 @@ export class BotService {
             };
           });
       }
+
+      // MAIN_MENU
       case '2': {
         const {
           title,
@@ -128,6 +145,8 @@ export class BotService {
             console.log('Action fired', message);
           });
       }
+
+      // REGISTRATION_MENU
       case '3': {
         const {
           title,
@@ -210,11 +229,12 @@ export class BotService {
             if (success) this.botAccountService.createAccount(source);
             return {
               success,
-              message: '',
+              message: success ? '' : 'Phones do not match',
             };
           });
       }
 
+      // GET_PIN_MENU
       case '3.2.3': {
         const {
           title,
@@ -237,9 +257,14 @@ export class BotService {
           .setAction((pin: string) => {
             console.log('Get Pin fired', pin);
             this.updateBotSession({ 'responses.get_pin': pin });
+            return {
+              success: true,
+              message: '',
+            };
           });
       }
 
+      // CONFIRM_PIN_MENU
       case '3.2.4': {
         const {
           title,
@@ -259,9 +284,18 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((pin: string) => {
+          .setAction(async (pin: number) => {
             console.log('Confirm Pin fired', pin);
-            this.updateBotSession({ 'responses.confirmed_pin': pin });
+            this.updateBotSession({ 'responses.confirmed_pin': +pin });
+            const success = await this.confirmPin(+pin);
+            if (success) {
+              this.botAccountService.activateAccount(this.source);
+            }
+            const successMessage = `Thank you for activating account ${this.source} please text Hi and Login with 4 digit pin for assistance please contact our support from the main menu`;
+            return {
+              success,
+              message: success ? successMessage : 'Pins do not match',
+            };
           });
       }
 
@@ -341,5 +375,10 @@ export class BotService {
   async confirmNumber(source: string): Promise<boolean> {
     const { responses } = (await this.getCurrentSession(this.source)) as any;
     return responses['get_phone'] === source;
+  }
+
+  async confirmPin(pin: number): Promise<boolean> {
+    const { responses } = (await this.getCurrentSession(this.source)) as any;
+    return +responses['get_pin'] === +pin;
   }
 }

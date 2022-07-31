@@ -6,7 +6,10 @@ export class BotAccountService {
   constructor(private userService: UserService) {}
 
   async createAccount(source: string) {
-    //
+    // rewuired for users created via listings
+    const account = await this.userService.getUserBySource(source);
+    if (account) return account;
+    // create
     return await this.userService.createBotAccount(source);
   }
 
