@@ -44,6 +44,25 @@ export const EnTranslations = {
     children: [],
   },
 
+  GET_PHONE_EXISTING_MENU: {
+    title:
+      'Please enter existing Account Number (With prefix e.g., +263 771 456789)',
+    options: [],
+    validation: new RegExp(/^(\+263|0)7[7-8|1|3][0-9]{7}$/),
+    validationResponse: 'Invalid Phone number',
+    expectedResponses: [],
+    children: [],
+  },
+
+  CONFIRM_EXISTING_PHONE_MENU: {
+    title: 'Enter confirmation code',
+    options: [],
+    validation: new RegExp(/^[0-9]{4}$/),
+    validationResponse: 'Invalid Confimation code',
+    expectedResponses: [],
+    children: [],
+  },
+
   CONFIRM_PHONE_MENU: {
     title: 'Confirm Account',
     options: [],
@@ -202,7 +221,10 @@ const MENU_MAPPINGS = {
   '3.2.2': EnTranslations.CONFIRM_PHONE_MENU,
   '3.2.3': EnTranslations.GET_PIN_MENU,
   '3.2.4': EnTranslations.CONFIRM_PIN_MENU,
-  '3.3.1': '',
+  '3.3.1': EnTranslations.GET_PHONE_EXISTING_MENU,
+  '3.3.2': EnTranslations.CONFIRM_EXISTING_PHONE_MENU,
+  '3.3.3': EnTranslations.GET_PHONE_MENU,
+  '3.3.4': EnTranslations.CONFIRM_PHONE_MENU,
   '3.4.1': '',
   '4': EnTranslations.TERMINATE_BOT,
 };

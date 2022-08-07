@@ -15,7 +15,7 @@ import { BotModule } from './resources/bot/bot.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://192.168.122.185/storefront'),
+    MongooseModule.forRoot('mongodb://localhost/storefront'),
     MailerModule.forRoot({
       transport: {
         host: 'localhost',

@@ -32,7 +32,10 @@ export class BotAccountService {
   async changeAccount(source: string, destination: string) {
     //Get user by source
     const user = await this.userService.getUserBySource(source);
-    return this.userService.update(user._id, { waBotPhone: destination });
+    return this.userService.update(user._id, {
+      waBotPhone: destination,
+      botActive: true,
+    });
   }
 
   async confirmPin(source: string, pin: string) {

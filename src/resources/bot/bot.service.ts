@@ -74,6 +74,10 @@ export class BotService {
         // Update session to progress to the next menu
         await this.moveBotCursor(botSession.currentMenu, nextMenu, null);
         //return next menu
+        if (+nextMenu === 4) {
+          return (await this.menuResolver(nextMenu).exec(response.message))
+            .message;
+        }
         return this.menuResolver(nextMenu).build();
       }
 
@@ -173,6 +177,7 @@ export class BotService {
             };
           });
       }
+
       // Get PHONE
       case '3.2.1': {
         const {
@@ -194,7 +199,6 @@ export class BotService {
         )
           .get()
           .setAction((source: string) => {
-            console.log('Save phone to account', source);
             this.updateBotSession({ 'responses.get_phone': source });
             return {
               success: true,
@@ -202,6 +206,7 @@ export class BotService {
             };
           });
       }
+
       // Confirm PHONE
       case '3.2.2': {
         const {
@@ -223,7 +228,6 @@ export class BotService {
         )
           .get()
           .setAction(async (source: string) => {
-            console.log('Confirm Number fired', source);
             this.updateBotSession({ 'responses.confirmed_phone': source });
             const success = await this.confirmNumber(source);
             if (success) this.botAccountService.createAccount(source);
@@ -255,7 +259,6 @@ export class BotService {
         )
           .get()
           .setAction((pin: string) => {
-            console.log('Get Pin fired', pin);
             this.updateBotSession({ 'responses.get_pin': pin });
             return {
               success: true,
@@ -285,7 +288,6 @@ export class BotService {
         )
           .get()
           .setAction(async (pin: number) => {
-            console.log('Confirm Pin fired', pin);
             this.updateBotSession({ 'responses.confirmed_pin': +pin });
             const success = await this.confirmPin(+pin);
             if (success) {
@@ -295,6 +297,166 @@ export class BotService {
             return {
               success,
               message: success ? successMessage : 'Pins do not match',
+            };
+          });
+      }
+
+      // Get EXISTING PHONE
+      case '3.3.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_PHONE_EXISTING_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3',
+          '3.3.1',
+          '3.3.2',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (source: string) => {
+            await this.updateBotSession({
+              'responses.get_existing_phone': source,
+            });
+
+            const account = await this.botAccountService.checkIfAccountExists(
+              source,
+            );
+
+            const exists = account !== null;
+
+            if (!exists) {
+              const { _id } = (await this.getCurrentSession(
+                this.source,
+              )) as any;
+              await this.updateSession(_id, {
+                status: 'closed',
+                menuLock: false,
+              });
+            }
+
+            // send sms
+
+            return {
+              success: exists,
+              message: exists ? '' : 'Account does not exist',
+            };
+          });
+      }
+
+      // CONFIRM_EXISTING_PHONE_MENU
+      case '3.3.2': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.CONFIRM_EXISTING_PHONE_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3.1.1',
+          '3.3.2',
+          '3.3.3',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (pin: number) => {
+            this.updateBotSession({ 'responses.confirmation_pin': +pin });
+            const success = await this.confirmExistingPhonePin(+pin);
+            const successMessage = ``;
+            return {
+              success,
+              message: success ? successMessage : 'Pins do not match',
+            };
+          });
+      }
+
+      // Get New PHONE
+      case '3.3.3': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_PHONE_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3.3.2',
+          '3.3.3',
+          '3.3.4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (source: string) => {
+            let success = true;
+            let message = '';
+            const { responses } = (await this.getCurrentSession(
+              this.source,
+            )) as any;
+            if (responses['get_existing_phone'] === source) {
+              success = false;
+              message = 'Current account cannot be the same as the previous';
+            }
+            this.updateBotSession({ 'responses.get_phone': source });
+            return {
+              success,
+              message,
+            };
+          });
+      }
+
+      // Confirm New PHONE
+      case '3.3.4': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.CONFIRM_PHONE_MENU;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3.3.3',
+          '3.3.4',
+          '4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (source: string) => {
+            this.updateBotSession({ 'responses.confirmed_phone': source });
+            const success = await this.confirmNumber(source);
+            let message = 'Phones do not match';
+            if (success) {
+              const { responses } = (await this.getCurrentSession(
+                this.source,
+              )) as any;
+              await this.botAccountService.changeAccount(
+                responses['get_existing_phone'],
+                responses['get_phone'],
+              );
+              message = `Your account number has been changed to ${responses['get_phone']}`;
+            }
+            return {
+              success,
+              message,
             };
           });
       }
@@ -319,12 +481,15 @@ export class BotService {
         )
           .get()
           .setAction(async (message: string) => {
-            console.log('4 Action fired', message);
             const { _id } = (await this.getCurrentSession(this.source)) as any;
-            return this.updateSession(_id, {
+            await this.updateSession(_id, {
               status: 'closed',
               menuLock: false,
             });
+            return {
+              success: true,
+              message: message,
+            };
           });
       }
 
@@ -336,7 +501,6 @@ export class BotService {
     const matched = this.menu.ExpectedResponses.filter((resp: any) => {
       return resp.toString().toLowerCase() === message.toLowerCase();
     });
-    console.log(matched);
     if (matched.length > 0) {
       return true;
     }
@@ -380,5 +544,9 @@ export class BotService {
   async confirmPin(pin: number): Promise<boolean> {
     const { responses } = (await this.getCurrentSession(this.source)) as any;
     return +responses['get_pin'] === +pin;
+  }
+
+  async confirmExistingPhonePin(pin: number): Promise<boolean> {
+    return 'accountExistPin' === 'accountExistPin';
   }
 }
