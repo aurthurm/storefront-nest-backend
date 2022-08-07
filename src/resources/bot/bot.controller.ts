@@ -11,4 +11,13 @@ export class BotController {
     const { source, message } = request.body;
     return await this.botService.getWhatsAppResponse(source, message);
   }
+
+  @Post('wa-auto')
+  async whatsAuto(@Req() request: Request) {
+    const { app, sender, message } = request.body;
+    const reply = await this.botService.getWhatsAppResponse(sender, message);
+    return {
+      reply,
+    };
+  }
 }
