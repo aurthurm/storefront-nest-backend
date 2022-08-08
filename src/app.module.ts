@@ -2,10 +2,12 @@ import { Module } from '@nestjs/common';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
 
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigModule } from '@nestjs/config';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { MongooseModule } from '@nestjs/mongoose';
 import { UserModule } from './resources/user/user.module';
 import { AuthModule } from './resources/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
@@ -15,7 +17,8 @@ import { BotModule } from './resources/bot/bot.module';
 
 @Module({
   imports: [
-    MongooseModule.forRoot('mongodb://192.168.122.185/storefront'),
+    ConfigModule.forRoot(),
+    MongooseModule.forRoot(`mongodb://${process.env.DATABASE_URL}/storefront`),
     MailerModule.forRoot({
       transport: {
         host: 'localhost',
