@@ -290,6 +290,8 @@ export class BotService {
           .setAction(async (pin: number) => {
             this.updateBotSession({ 'responses.confirmed_pin': +pin });
             const success = await this.confirmPin(+pin);
+            console.log('SOURCE : ', this.source);
+
             if (success) {
               this.botAccountService.activateAccount(this.source);
             }
