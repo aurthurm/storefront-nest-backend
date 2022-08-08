@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class SmsService {
-  sendSms(recipients: any[], message: string) {
+  send(recipients: any[], message: string) {
     // return true if successful
+    console.log('sending: ', { recipients, message });
     return true;
   }
 }

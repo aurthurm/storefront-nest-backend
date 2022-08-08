@@ -1,5 +1,5 @@
 export class OTPGenerator {
-  static generateOTP(length: number): string {
+  generateOTP(length: number): string {
     let result = '';
     const characters = '0123456789';
     const charactersLength = characters.length;

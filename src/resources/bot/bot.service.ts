@@ -5,6 +5,8 @@ import { EnTranslations } from 'src/helpers/constants';
 import BotMenuBuilder from 'src/helpers/menu.builder';
 import { Bot } from './entities/bot.entity';
 import { BotAccountService } from 'src/providers/bot-account/bot-account.service';
+import { OTPGenerator } from 'src/helpers/otp.generator';
+import { SmsService } from 'src/providers/sms/sms.service';
 
 @Injectable()
 export class BotService {
@@ -342,9 +344,16 @@ export class BotService {
                 status: 'closed',
                 menuLock: false,
               });
+            } else {
+              const otp = new OTPGenerator().generateOTP(4);
+              await this.updateBotSession({
+                'responses.otp': otp,
+              });
+              new SmsService().send(
+                [this.source],
+                `Your one time account confirmation password is ${otp}`,
+              );
             }
-
-            // send sms
 
             return {
               success: exists,
@@ -549,6 +558,7 @@ export class BotService {
   }
 
   async confirmExistingPhonePin(pin: number): Promise<boolean> {
-    return 'accountExistPin' === 'accountExistPin';
+    const { responses } = (await this.getCurrentSession(this.source)) as any;
+    return +responses['otp'] === +pin;
   }
 }
