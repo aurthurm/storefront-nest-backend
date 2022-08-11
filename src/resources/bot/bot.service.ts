@@ -13,9 +13,11 @@ export class BotService {
   source = '';
   isUserRegistered = false;
   menu: BotMenuBuilder = null;
+
   constructor(
     @InjectModel(Bot.name) private readonly botModel: Model<Bot>,
     private botAccountService: BotAccountService,
+    private smsService: SmsService,
   ) {}
   //
 
@@ -336,6 +338,7 @@ export class BotService {
 
             const exists = account !== null;
 
+            console.log('exists: ', exists);
             if (!exists) {
               const { _id } = (await this.getCurrentSession(
                 this.source,
@@ -345,14 +348,23 @@ export class BotService {
                 menuLock: false,
               });
             } else {
+              console.log('generating otp');
               const otp = new OTPGenerator().generateOTP(4);
               await this.updateBotSession({
                 'responses.otp': otp,
               });
-              new SmsService().send(
-                [this.source],
-                `Your one time account confirmation password is ${otp}`,
-              );
+
+              console.log('otp generated: sending sms: ', otp);
+
+              this.smsService
+                .sendSMS(
+                  this.source,
+                  `Your one time account confirmation password is ${otp}`,
+                )
+                .subscribe({
+                  next: (result) => console.log(result),
+                  error: (err) => console.log(err),
+                });
             }
 
             return {

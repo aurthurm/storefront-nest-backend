@@ -12,7 +12,6 @@ import { UserModule } from './resources/user/user.module';
 import { AuthModule } from './resources/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './resources/auth/roles.guard';
-import { EmailService } from './providers/email/email.service';
 import { BotModule } from './resources/bot/bot.module';
 
 @Module({
@@ -21,17 +20,20 @@ import { BotModule } from './resources/bot/bot.module';
     MongooseModule.forRoot(`mongodb://${process.env.DATABASE_URL}/storefront`),
     MailerModule.forRoot({
       transport: {
-        host: 'localhost',
-        port: 1025,
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
         ignoreTLS: true,
         secure: false,
         auth: {
-          user: process.env.MAILDEV_INCOMING_USER,
-          pass: process.env.MAILDEV_INCOMING_PASS,
+          user: process.env.SMTP_USERNAME,
+          pass: process.env.SMTP_PASSWORD,
+        },
+        tls: {
+          rejectUnauthorized: false,
         },
       },
       defaults: {
-        from: '"No Reply" <no-reply@localhost>',
+        from: '"No Reply" auto@storefront',
       },
       preview: true,
       template: {
