@@ -34,14 +34,15 @@ export class BotService {
     if (botSession === null) {
       // Is user registered?
       const account = await this.botAccountService.checkIfAccountExists(source);
-      let nextMenu = '3';
+      let nextMenu = '3'; // Registration
       if (account) {
-        nextMenu = '2';
+        nextMenu = '1.1'; // lOGIN
+
         if (!account.botActive) {
-          nextMenu = '4';
+          nextMenu = '4'; // Termination
           if (account.status == 'confirm') {
             responses['get_phone'] = account.waBotPhone;
-            nextMenu = '3.2.2';
+            nextMenu = '3.2.2'; // new account registration and activation
           }
         }
       }
@@ -129,6 +130,40 @@ export class BotService {
           });
       }
 
+      // LOGIN
+      case '1.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.LOGIN;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '1',
+          '1.1',
+          '2',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (pin: string) => {
+            const success = await this.botAccountService.pinLogin(
+              this.source,
+              pin,
+            );
+
+            return {
+              success,
+              message: success ? '' : 'Invalid Pin: Try again',
+            };
+          });
+      }
+
       // MAIN_MENU
       case '2': {
         const {
@@ -168,51 +203,55 @@ export class BotService {
           options,
           '1',
           '3',
-          null,
-          validation,
-          validationResponse,
-          expectedResponses,
-        )
-          .get()
-          .setAction((message: string) => {
-            return {
-              success: true,
-              message: '',
-            };
-          });
-      }
-
-      // Get PHONE
-      case '3.2.1': {
-        const {
-          title,
-          options,
-          validation,
-          validationResponse,
-          expectedResponses,
-        } = EnTranslations.GET_PHONE_MENU;
-        return new BotMenuBuilder(
-          title,
-          options,
-          '3',
           '3.2.1',
-          '3.2.2',
           validation,
           validationResponse,
           expectedResponses,
         )
           .get()
-          .setAction((source: string) => {
-            this.updateBotSession({ 'responses.get_phone': source });
+          .setAction(async (message: string) => {
+            const account = await this.botAccountService.checkIfAccountExists(
+              this.source,
+            );
+
+            const exists = account !== null;
+
+            if (exists) {
+              const { _id } = (await this.getCurrentSession(
+                this.source,
+              )) as any;
+              await this.updateSession(_id, {
+                status: 'closed',
+                menuLock: false,
+              });
+            } else {
+              const otp = new OTPGenerator().generateOTP(4);
+              await this.updateBotSession({
+                'responses.otp': otp,
+              });
+
+              console.log('otp generated: sending sms: ', otp);
+
+              this.smsService
+                .sendSMS(
+                  this.source,
+                  `Your one time account confirmation password is ${otp}`,
+                )
+                .subscribe({
+                  next: (result) => console.log(result),
+                  error: (err) => console.log(err),
+                });
+            }
+
             return {
-              success: true,
-              message: '',
+              success: !exists,
+              message: !exists ? '' : 'Account already exist',
             };
           });
       }
 
-      // Confirm PHONE
-      case '3.2.2': {
+      // Confirm whatsapp number used to access bot
+      case '3.2.1': {
         const {
           title,
           options,
@@ -231,13 +270,12 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction(async (source: string) => {
-            this.updateBotSession({ 'responses.confirmed_phone': source });
-            const success = await this.confirmNumber(source);
-            if (success) this.botAccountService.createAccount(source);
+          .setAction(async (pin: string) => {
+            this.updateBotSession({ 'responses.otp_confirmation': +pin });
+            const success = await this.confirmExistingPhonePin(+pin);
             return {
               success,
-              message: success ? '' : 'Phones do not match',
+              message: success ? '' : 'Invalid OTP',
             };
           });
       }
@@ -294,10 +332,13 @@ export class BotService {
           .setAction(async (pin: number) => {
             this.updateBotSession({ 'responses.confirmed_pin': +pin });
             const success = await this.confirmPin(+pin);
-            console.log('SOURCE : ', this.source);
 
             if (success) {
-              this.botAccountService.activateAccount(this.source);
+              await this.botAccountService.createAccount(
+                this.source,
+                pin.toString(),
+                true,
+              );
             }
             const successMessage = `Thank you for activating account ${this.source} please text Hi and Login with 4 digit pin for assistance please contact our support from the main menu`;
             return {
@@ -338,7 +379,6 @@ export class BotService {
 
             const exists = account !== null;
 
-            console.log('exists: ', exists);
             if (!exists) {
               const { _id } = (await this.getCurrentSession(
                 this.source,
@@ -348,7 +388,6 @@ export class BotService {
                 menuLock: false,
               });
             } else {
-              console.log('generating otp');
               const otp = new OTPGenerator().generateOTP(4);
               await this.updateBotSession({
                 'responses.otp': otp,

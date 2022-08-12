@@ -5,12 +5,12 @@ import { UserService } from 'src/resources/user/user.service';
 export class BotAccountService {
   constructor(private userService: UserService) {}
 
-  async createAccount(source: string) {
+  async createAccount(source: string, pin: string, active: boolean) {
     // rewuired for users created via listings
     const account = await this.userService.getUserBySource(source);
     if (account) return account;
     // create
-    return await this.userService.createBotAccount(source);
+    return await this.userService.createBotAccount(source, pin, active);
   }
 
   async activateAccount(source: string) {
@@ -36,6 +36,12 @@ export class BotAccountService {
       waBotPhone: destination,
       botActive: true,
     });
+  }
+
+  async pinLogin(source: string, pin: string) {
+    //
+    const user = await this.userService.getUserBySource(source);
+    return user.pin === pin;
   }
 
   async confirmPin(source: string, pin: string) {

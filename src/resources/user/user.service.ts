@@ -23,9 +23,13 @@ export class UserService {
     return createUser.save();
   }
 
-  createBotAccount(source: string) {
+  createBotAccount(source: string, pin: string, active: boolean) {
     const createUser = new this.userModel();
     createUser.waBotPhone = source;
+    createUser.phone = source;
+    createUser.email = `${source}@storefront`;
+    createUser.pin = pin;
+    createUser.botActive = active;
     return createUser.save();
   }
 

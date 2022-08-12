@@ -20,6 +20,15 @@ export const EnTranslations = {
     children: [],
   },
 
+  LOGIN: {
+    title: 'Please login with your 4 digit pin',
+    options: [],
+    validation: new RegExp(/^[0-9]{4}$/),
+    validationResponse: 'Invalid Pin. Please login with your 4 digit pin',
+    expectedResponses: [],
+    children: [],
+  },
+
   REGISTRATION_MENU: {
     title: ' Welcome to StoreFront Services \nRegistration Menu',
     options: [
@@ -66,7 +75,7 @@ export const EnTranslations = {
   CONFIRM_PHONE_MENU: {
     title: 'Confirm Account',
     options: [],
-    validation: new RegExp(/^(\+263|0)7[7-8|1|3][0-9]{7}$/),
+    validation: new RegExp(/^[0-9]{4}$/), // new RegExp(/^(\+263|0)7[7-8|1|3][0-9]{7}$/),
     validationResponse: '',
     expectedResponses: [],
     children: [],
@@ -204,6 +213,7 @@ export const EnTranslations = {
 
 const MENU_MAPPINGS = {
   '1': EnTranslations.LISTING_INIT_MESSAGE,
+  '1.1': EnTranslations.LOGIN,
   '2': EnTranslations.MAIN_MENU,
   '2.1': EnTranslations.VIEW_LISTINGS,
   '2.2': EnTranslations.DELETE_LISTING,
@@ -217,10 +227,9 @@ const MENU_MAPPINGS = {
   '2.5': EnTranslations.SUPPORT,
   '3': EnTranslations.REGISTRATION_MENU,
   '3.1.1': '',
-  '3.2.1': EnTranslations.GET_PHONE_MENU,
-  '3.2.2': EnTranslations.CONFIRM_PHONE_MENU,
-  '3.2.3': EnTranslations.GET_PIN_MENU,
-  '3.2.4': EnTranslations.CONFIRM_PIN_MENU,
+  '3.2.1': EnTranslations.CONFIRM_PHONE_MENU,
+  '3.2.2': EnTranslations.GET_PIN_MENU,
+  '3.2.3': EnTranslations.CONFIRM_PIN_MENU,
   '3.3.1': EnTranslations.GET_PHONE_EXISTING_MENU,
   '3.3.2': EnTranslations.CONFIRM_EXISTING_PHONE_MENU,
   '3.3.3': EnTranslations.GET_PHONE_MENU,
