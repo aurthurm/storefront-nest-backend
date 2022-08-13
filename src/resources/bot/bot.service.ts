@@ -232,15 +232,10 @@ export class BotService {
 
               console.log('otp generated: sending sms: ', otp);
 
-              this.smsService
-                .sendSMS(
-                  this.source,
-                  `Your one time account confirmation password is ${otp}`,
-                )
-                .subscribe({
-                  next: (result) => console.log(result),
-                  error: (err) => console.log(err),
-                });
+              this.smsService.sendSMS(
+                [this.source],
+                `Your one time account confirmation password is ${otp}`,
+              );
             }
 
             return {
@@ -395,15 +390,10 @@ export class BotService {
 
               console.log('otp generated: sending sms: ', otp);
 
-              this.smsService
-                .sendSMS(
-                  this.source,
-                  `Your one time account confirmation password is ${otp}`,
-                )
-                .subscribe({
-                  next: (result) => console.log(result),
-                  error: (err) => console.log(err),
-                });
+              this.smsService.sendSMS(
+                [this.source],
+                `Your one time account confirmation password is ${otp}`,
+              );
             }
 
             return {
