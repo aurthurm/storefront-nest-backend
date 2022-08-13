@@ -66,4 +66,7 @@ export class CreateUserDto {
 
   @ApiProperty()
   botActive: boolean;
+
+  @ApiProperty()
+  eacNumber: string;
 }

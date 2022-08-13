@@ -22,14 +22,11 @@ import { BotModule } from './resources/bot/bot.module';
       transport: {
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
-        ignoreTLS: true,
-        secure: false,
+        ignoreTLS: false,
+        secure: true,
         auth: {
           user: process.env.SMTP_USERNAME,
           pass: process.env.SMTP_PASSWORD,
-        },
-        tls: {
-          rejectUnauthorized: false,
         },
       },
       defaults: {

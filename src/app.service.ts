@@ -9,7 +9,8 @@ export class AppService {
     this.mailerService
       .sendMail({
         to: 'tendaikatsande@live.com', // list of receivers
-        from: 'noreply@nestjs.com', // sender address
+        from: 'info@storefront.systems',
+        cc: 'aurthurmusendame@gmail.com', // sender address
         subject: 'Testing Nest MailerModule ✔', // Subject line
         text: 'welcome', // plaintext body
         html: '<b>welcome</b>', // HTML body content

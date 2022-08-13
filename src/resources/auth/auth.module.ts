@@ -13,10 +13,12 @@ import { UserService } from '../user/user.service';
 import { jwtConstants } from 'src/helpers/constants';
 import { JwtStrategy } from './jwt.strategy';
 import { EmailService } from 'src/providers/email/email.service';
+import { AccountModule } from '../account/account.module';
 
 @Module({
   imports: [
     UserModule,
+    AccountModule,
     PassportModule,
     JwtModule.register({
       secret: jwtConstants.secret,

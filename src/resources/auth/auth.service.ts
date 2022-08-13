@@ -10,16 +10,18 @@ import { Request } from 'express';
 import { randomUUID } from 'crypto';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { EmailService } from 'src/providers/email/email.service';
+import { AccountService } from '../account/account.service';
 @Injectable()
 export class AuthService {
   SALT_ROUNS = 10;
   constructor(
     private usersService: UserService,
+    private accountService: AccountService,
     private jwtService: JwtService,
     private emailService: EmailService,
   ) {}
 
-  async validateUser(username: string, pass: string): Promise<any> {
+  async validateUser(username: string, pass: string, role): Promise<any> {
     const user = await this.usersService.findByEmailOrPhone(username);
     if (!user) return null;
     const isMatch =

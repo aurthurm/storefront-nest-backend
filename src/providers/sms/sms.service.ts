@@ -41,7 +41,7 @@ export class SmsService {
   }
 
   sendViaEconet(mobiles: string[], sms: string): Observable<any> {
-    return this.httpService.post(
+    return this.httpService.get(
       `${process.env.SMS_ECONET_GATEWAY}&mobiles=${mobiles.join(
         ',',
       )}&sms=${sms}&senderid=StoreFront`,

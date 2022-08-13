@@ -88,6 +88,10 @@ export class User {
     default: false,
   })
   botActive: boolean;
+
+  // Estate Agent Council Verification Number
+  @Prop({})
+  eacNumber: string;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

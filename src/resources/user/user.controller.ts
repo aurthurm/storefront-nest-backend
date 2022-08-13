@@ -7,14 +7,11 @@ import {
   Param,
   Delete,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiTags } from '@nestjs/swagger';
-import { Roles } from '../auth/roles.decorator';
-import { Role } from 'src/helpers/constants';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('user')
