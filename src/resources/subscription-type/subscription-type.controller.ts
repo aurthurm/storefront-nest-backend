@@ -1,11 +1,23 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { SubscriptionTypeService } from './subscription-type.service';
 import { CreateSubscriptionTypeDto } from './dto/create-subscription-type.dto';
 import { UpdateSubscriptionTypeDto } from './dto/update-subscription-type.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('subscription-type')
+@ApiTags('subscription-type')
 export class SubscriptionTypeController {
-  constructor(private readonly subscriptionTypeService: SubscriptionTypeService) {}
+  constructor(
+    private readonly subscriptionTypeService: SubscriptionTypeService,
+  ) {}
 
   @Post()
   create(@Body() createSubscriptionTypeDto: CreateSubscriptionTypeDto) {
@@ -19,16 +31,19 @@ export class SubscriptionTypeController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.subscriptionTypeService.findOne(+id);
+    return this.subscriptionTypeService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateSubscriptionTypeDto: UpdateSubscriptionTypeDto) {
-    return this.subscriptionTypeService.update(+id, updateSubscriptionTypeDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateSubscriptionTypeDto: UpdateSubscriptionTypeDto,
+  ) {
+    return this.subscriptionTypeService.update(id, updateSubscriptionTypeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.subscriptionTypeService.remove(+id);
+    return this.subscriptionTypeService.remove(id);
   }
 }

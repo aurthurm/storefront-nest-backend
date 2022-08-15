@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { CreateLeaseDto } from './dto/create-lease.dto';
 import { UpdateLeaseDto } from './dto/update-lease.dto';
+import { Lease, LeaseDocument } from './entities/lease.entity';
 
 @Injectable()
 export class LeaseService {
-  create(createLeaseDto: CreateLeaseDto) {
-    return 'This action adds a new lease';
+  constructor(
+    @InjectModel(Lease.name)
+    private leaseModel: Model<LeaseDocument>,
+  ) {}
+
+  async create(createLeaseDto: CreateLeaseDto) {
+    return await this.leaseModel.create(createLeaseDto);
   }
 
-  findAll() {
-    return `This action returns all lease`;
+  async findAll(query = {}) {
+    return await this.leaseModel.find(query);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} lease`;
+  async findOne(id: string) {
+    return await this.leaseModel.findById(id);
   }
 
-  update(id: number, updateLeaseDto: UpdateLeaseDto) {
-    return `This action updates a #${id} lease`;
+  async update(id: string, updateLeaseDto: UpdateLeaseDto) {
+    return await this.leaseModel.findByIdAndUpdate(id, updateLeaseDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} lease`;
+  async remove(id: string) {
+    return await this.leaseModel.remove(id);
   }
 }

@@ -13,6 +13,12 @@ import { AuthModule } from './resources/auth/auth.module';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './resources/auth/roles.guard';
 import { BotModule } from './resources/bot/bot.module';
+import { ListingModule } from './resources/listing/listing.module';
+import { TenantModule } from './resources/tenant/tenant.module';
+import { LeaseModule } from './resources/lease/lease.module';
+import { SubscriptionTypeModule } from './resources/subscription-type/subscription-type.module';
+import { SubscriptionModule } from './resources/subscription/subscription.module';
+import { ExchangeRateModule } from './resources/exchange-rate/exchange-rate.module';
 
 @Module({
   imports: [
@@ -44,6 +50,12 @@ import { BotModule } from './resources/bot/bot.module';
     AuthModule,
     UserModule,
     BotModule,
+    ListingModule,
+    TenantModule,
+    LeaseModule,
+    SubscriptionTypeModule,
+    SubscriptionModule,
+    ExchangeRateModule,
   ],
   controllers: [AppController],
   providers: [

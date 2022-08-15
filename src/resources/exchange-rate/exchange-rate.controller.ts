@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { ExchangeRateService } from './exchange-rate.service';
 import { CreateExchangeRateDto } from './dto/create-exchange-rate.dto';
 import { UpdateExchangeRateDto } from './dto/update-exchange-rate.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('exchange-rate')
+@ApiTags('exchange-rate')
 export class ExchangeRateController {
   constructor(private readonly exchangeRateService: ExchangeRateService) {}
 
@@ -19,16 +29,19 @@ export class ExchangeRateController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.exchangeRateService.findOne(+id);
+    return this.exchangeRateService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateExchangeRateDto: UpdateExchangeRateDto) {
-    return this.exchangeRateService.update(+id, updateExchangeRateDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateExchangeRateDto: UpdateExchangeRateDto,
+  ) {
+    return this.exchangeRateService.update(id, updateExchangeRateDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.exchangeRateService.remove(+id);
+    return this.exchangeRateService.remove(id);
   }
 }

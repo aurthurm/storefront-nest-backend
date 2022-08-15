@@ -22,7 +22,8 @@ export class AuthService {
   ) {}
 
   async validateUser(username: string, pass: string, role): Promise<any> {
-    const user = await this.usersService.findByEmailOrPhone(username);
+    const service = role == 'admin' ? this.accountService : this.usersService;
+    const user = await service.findByEmailOrPhone(username);
     if (!user) return null;
     const isMatch =
       (await bcrypt.compare(pass, user.pin)) ||
@@ -30,7 +31,7 @@ export class AuthService {
     if (user && isMatch) {
       const updatedUser = new UpdateUserDto();
       updatedUser.lastLogin = new Date();
-      this.usersService.update(user._id, updatedUser);
+      service.update(user._id, updatedUser);
       const { pin, password, ...result } = user;
       return result;
     }
@@ -44,9 +45,9 @@ export class AuthService {
     };
   }
 
-  async resetPassword(email: string, request: Request) {
-    console.log(request.headers.origin);
-    const user = await this.usersService.findByEmailOrPhone(email);
+  async resetPassword(email: string, request: Request, role: string) {
+    const service = role == 'admin' ? this.accountService : this.usersService;
+    const user = await service.findByEmailOrPhone(email);
     if (!user) {
       throw new NotFoundException(`User with email address ${email} not found`);
     }
@@ -56,14 +57,15 @@ export class AuthService {
     updatedUser.resetPasswordKey = resetKey;
     updatedUser.resetPinKey = resetKey;
     updatedUser.lastPasswordReset = new Date();
-    this.usersService.update(user._id, updatedUser);
+    service.update(user._id, updatedUser);
     //send email to the user
     this.emailService.sendEmail();
     console.log(resetUrl, user);
   }
 
-  async newPassword(resetkey: string, password: string) {
-    const user = await this.usersService.findByResetKey(resetkey);
+  async newPassword(resetkey: string, password: string, role: string) {
+    const service = role == 'admin' ? this.accountService : this.usersService;
+    const user = await service.findByResetKey(resetkey);
     if (user) {
       // check date diff 60000 are are seconds
       const now = +new Date();
@@ -79,7 +81,7 @@ export class AuthService {
       updatedUser.password = password;
       updatedUser.pin = await bcrypt.hash(password, this.SALT_ROUNS);
       updatedUser.password = await bcrypt.hash(password, this.SALT_ROUNS);
-      this.usersService.update(user._id, updatedUser);
+      service.update(user._id, updatedUser);
 
       return { message: 'Password reset successfully' };
     }

@@ -37,13 +37,13 @@ export class AuthController {
    */
   @Post('reset-password')
   resetPassword(@Body() payload: any, @Request() req) {
-    const { email } = payload;
-    return this.authService.resetPassword(email, req);
+    const { email, role } = payload;
+    return this.authService.resetPassword(email, req, role);
   }
 
   @Post('new-password')
   newPassword(@Body() payload: any) {
-    const { resetkey, password } = payload;
-    return this.authService.newPassword(resetkey, password);
+    const { resetkey, password, role } = payload;
+    return this.authService.newPassword(resetkey, password, role);
   }
 }

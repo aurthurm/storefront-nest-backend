@@ -1,9 +1,19 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { LeaseService } from './lease.service';
 import { CreateLeaseDto } from './dto/create-lease.dto';
 import { UpdateLeaseDto } from './dto/update-lease.dto';
+import { ApiTags } from '@nestjs/swagger';
 
 @Controller('lease')
+@ApiTags('lease')
 export class LeaseController {
   constructor(private readonly leaseService: LeaseService) {}
 
@@ -19,16 +29,16 @@ export class LeaseController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.leaseService.findOne(+id);
+    return this.leaseService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateLeaseDto: UpdateLeaseDto) {
-    return this.leaseService.update(+id, updateLeaseDto);
+    return this.leaseService.update(id, updateLeaseDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.leaseService.remove(+id);
+    return this.leaseService.remove(id);
   }
 }
