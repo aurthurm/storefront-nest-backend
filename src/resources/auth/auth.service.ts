@@ -2,6 +2,7 @@ import {
   UnauthorizedException,
   Injectable,
   NotFoundException,
+  Logger,
 } from '@nestjs/common';
 import { UserService } from 'src/resources/user/user.service';
 import { JwtService } from '@nestjs/jwt';
@@ -21,13 +22,14 @@ export class AuthService {
     private emailService: EmailService,
   ) {}
 
-  async validateUser(username: string, pass: string, role): Promise<any> {
+  async validateUser(req: any): Promise<any> {
+    const { username, password, role } = req.body;
     const service = role == 'admin' ? this.accountService : this.usersService;
     const user = await service.findByEmailOrPhone(username);
     if (!user) return null;
     const isMatch =
-      (await bcrypt.compare(pass, user.pin)) ||
-      (await bcrypt.compare(pass, user.password));
+      (await bcrypt.compare(password, user.pin)) ||
+      (await bcrypt.compare(password, user.password));
     if (user && isMatch) {
       const updatedUser = new UpdateUserDto();
       updatedUser.lastLogin = new Date();
@@ -39,7 +41,12 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { _id: user?._id, phone: user?.phone, email: user?.email };
+    const payload = {
+      _id: user?._id,
+      phone: user?.phone,
+      email: user?.email,
+      roles: user?.roles,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -60,7 +67,6 @@ export class AuthService {
     service.update(user._id, updatedUser);
     //send email to the user
     this.emailService.sendEmail();
-    console.log(resetUrl, user);
   }
 
   async newPassword(resetkey: string, password: string, role: string) {

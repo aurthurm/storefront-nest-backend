@@ -15,7 +15,7 @@ export class AccountService {
     @InjectModel(Account.name) private accountModel: Model<AccountDocument>,
   ) {}
 
-  async create(createAccountDto: CreateAccountDto) {
+  async create(createAccountDto: CreateAccountDto | any) {
     const createAccount = new this.accountModel(createAccountDto);
     createAccount.pin = await bcrypt.hash(createAccount.pin, this.SALT_ROUNS);
     createAccount.password = await bcrypt.hash(
@@ -42,6 +42,10 @@ export class AccountService {
 
   async findOne(id: string) {
     return await this.accountModel.findById(id).lean();
+  }
+
+  async findOneBy(query = {}) {
+    return await this.accountModel.findOne(query);
   }
 
   async findByEmailOrPhone(payload: string) {

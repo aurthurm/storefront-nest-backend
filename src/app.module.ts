@@ -19,6 +19,9 @@ import { LeaseModule } from './resources/lease/lease.module';
 import { SubscriptionTypeModule } from './resources/subscription-type/subscription-type.module';
 import { SubscriptionModule } from './resources/subscription/subscription.module';
 import { ExchangeRateModule } from './resources/exchange-rate/exchange-rate.module';
+import { AppInitService } from './providers/initialiser';
+import { AccountModule } from './resources/account/account.module';
+import { TransactionModule } from './resources/transaction/transaction.module';
 
 @Module({
   imports: [
@@ -49,6 +52,7 @@ import { ExchangeRateModule } from './resources/exchange-rate/exchange-rate.modu
     }),
     AuthModule,
     UserModule,
+    AccountModule,
     BotModule,
     ListingModule,
     TenantModule,
@@ -56,6 +60,7 @@ import { ExchangeRateModule } from './resources/exchange-rate/exchange-rate.modu
     SubscriptionTypeModule,
     SubscriptionModule,
     ExchangeRateModule,
+    TransactionModule,
   ],
   controllers: [AppController],
   providers: [
@@ -64,6 +69,7 @@ import { ExchangeRateModule } from './resources/exchange-rate/exchange-rate.modu
       provide: APP_GUARD,
       useClass: RolesGuard,
     },
+    AppInitService,
   ],
 })
 export class AppModule {}
