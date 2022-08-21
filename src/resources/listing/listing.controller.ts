@@ -6,11 +6,17 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
-import { CreateListingDto } from './dto/create-listing.dto';
+import { CreateListingDto, ListingProperties } from './dto/create-listing.dto';
 import { UpdateListingDto } from './dto/update-listing.dto';
 import { ApiTags } from '@nestjs/swagger';
+import {
+  CollectionResponse,
+  ValidationPipe,
+} from '@forlagshuset/nestjs-mongoose-paginate';
+import { ListingDocument } from './entities/listing.entity';
 
 @Controller('listing')
 @ApiTags('listing')
@@ -18,13 +24,29 @@ export class ListingController {
   constructor(private readonly listingService: ListingService) {}
 
   @Post()
-  create(@Body() createListingDto: CreateListingDto) {
-    return this.listingService.create(createListingDto);
+  async create(@Body() createListingDto: CreateListingDto) {
+    return {
+      data: await this.listingService.create(createListingDto),
+    };
+  }
+
+  @Post('/bulk')
+  async bulkCreate(@Body() listings: CreateListingDto[]) {
+    return {
+      data: await this.listingService.bulkCreate(listings),
+    };
   }
 
   @Get()
   findAll() {
     return this.listingService.findAll();
+  }
+
+  @Get('filter')
+  filter(
+    @Query(new ValidationPipe(ListingProperties)) collectionDto: any,
+  ): Promise<CollectionResponse<ListingDocument>> {
+    return this.listingService.filter(collectionDto);
   }
 
   @Get(':id')

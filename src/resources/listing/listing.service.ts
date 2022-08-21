@@ -1,3 +1,7 @@
+import {
+  CollectionResponse,
+  DocumentCollector,
+} from '@forlagshuset/nestjs-mongoose-paginate';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -8,26 +12,37 @@ import { Listing, ListingDocument } from './entities/listing.entity';
 @Injectable()
 export class ListingService {
   constructor(
-    @InjectModel(Listing.name) private accountModel: Model<ListingDocument>,
+    @InjectModel(Listing.name) private listingModel: Model<ListingDocument>,
   ) {}
 
   async create(createListingDto: CreateListingDto) {
-    return await this.accountModel.create(createListingDto);
+    return await this.listingModel.create(createListingDto);
+  }
+
+  async bulkCreate(listings: CreateListingDto[]) {
+    return await this.listingModel.create(listings);
   }
 
   async findAll(query = {}) {
-    return await this.accountModel.find(query);
+    return await this.listingModel.find(query);
+  }
+
+  async filter(
+    collectionDto: any,
+  ): Promise<CollectionResponse<ListingDocument>> {
+    const collector = new DocumentCollector<ListingDocument>(this.listingModel);
+    return collector.find(collectionDto);
   }
 
   async findOne(id: string) {
-    return await this.accountModel.findById(id);
+    return await this.listingModel.findById(id);
   }
 
   async update(id: string, updateListingDto: UpdateListingDto) {
-    return await this.accountModel.findByIdAndUpdate(id, updateListingDto);
+    return await this.listingModel.findByIdAndUpdate(id, updateListingDto);
   }
 
   async remove(id: string) {
-    return await this.accountModel.remove(id);
+    return await this.listingModel.remove(id);
   }
 }

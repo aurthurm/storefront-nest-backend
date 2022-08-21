@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import paginate from 'mongoose-paginate-v2';
 import { Document } from 'mongoose';
 import { Role, UserRoles } from 'src/helpers/constants';
 

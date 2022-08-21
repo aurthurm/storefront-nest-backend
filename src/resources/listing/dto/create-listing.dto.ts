@@ -1,6 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
+import {
+  CollectionProperties,
+  Expose,
+} from '@forlagshuset/nestjs-mongoose-paginate';
 
 export class CreateListingDto {
+  @ApiProperty()
+  listingReference: string;
+
   @ApiProperty()
   title: string;
 
@@ -39,4 +46,15 @@ export class CreateListingDto {
 
   @ApiProperty()
   subscriptionId: string;
+}
+
+export class ListingProperties extends CollectionProperties {
+  @Expose({ name: 'createdAt', sortable: true })
+  readonly createdAt: 'desc' | 'asc';
+
+  @Expose({ sortable: true, default: true, filterable: true })
+  readonly expirationDate: 'desc' | 'asc';
+
+  @Expose({ sortable: true, default: true, filterable: true })
+  readonly title: 'desc' | 'asc';
 }

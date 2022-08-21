@@ -6,6 +6,9 @@ export type ListingDocument = Listing & Document;
   timestamps: true,
 })
 export class Listing {
+  @Prop({})
+  listingReference: string;
+
   @Prop()
   title: string;
 
@@ -46,4 +49,11 @@ export class Listing {
   subscriptionId: string;
 }
 
-export const ListingSchema = SchemaFactory.createForClass(Listing);
+const _ListingSchema = SchemaFactory.createForClass(Listing);
+
+_ListingSchema.index(
+  { listingReference: 1, advertiserId: 1 },
+  { unique: true },
+);
+
+export const ListingSchema = _ListingSchema;
