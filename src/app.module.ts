@@ -32,10 +32,13 @@ import { TransactionModule } from './resources/transaction/transaction.module';
         host: process.env.SMTP_HOST,
         port: process.env.SMTP_PORT,
         ignoreTLS: false,
-        secure: true,
+        secure: false,
         auth: {
           user: process.env.SMTP_USERNAME,
           pass: process.env.SMTP_PASSWORD,
+        },
+        tls: {
+          rejectUnauthorized: false,
         },
       },
       defaults: {
@@ -72,4 +75,4 @@ import { TransactionModule } from './resources/transaction/transaction.module';
     AppInitService,
   ],
 })
-export class AppModule {}
+export class AppModule { }
