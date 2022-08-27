@@ -6,6 +6,10 @@ import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserDocument } from './entities/user.entity';
+import {
+  CollectionResponse,
+  DocumentCollector,
+} from '@forlagshuset/nestjs-mongoose-paginate';
 
 @Injectable()
 export class UserService {
@@ -13,7 +17,7 @@ export class UserService {
 
   constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  async create(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto) {
     const createUser = new this.userModel(createUserDto);
     createUser.pin = await bcrypt.hash(createUser.pin, this.SALT_ROUNS);
     createUser.password = await bcrypt.hash(
@@ -23,19 +27,33 @@ export class UserService {
     return createUser.save();
   }
 
+  async create(createUserDto: CreateUserDto) {
+    const createUser = new this.userModel(createUserDto);
+    createUser.status = 'confirm';
+    return createUser.save();
+  }
+
   createBotAccount(source: string, pin: string, active: boolean) {
     const createUser = new this.userModel();
     createUser.waBotPhone = source;
     createUser.phone = source;
     createUser.email = `${source}@storefront`;
     createUser.pin = pin;
+    createUser.status = 'active';
     createUser.botActive = active;
     return createUser.save();
   }
 
+  updateBotAccount;
+
   async findAll(query = {}) {
     console.log(query);
     return await this.userModel.find(query).exec();
+  }
+
+  async filter(collectionDto: any): Promise<CollectionResponse<UserDocument>> {
+    const collector = new DocumentCollector<UserDocument>(this.userModel);
+    return collector.find(collectionDto);
   }
 
   async findOne(id: string) {

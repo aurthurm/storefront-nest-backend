@@ -101,4 +101,9 @@ export default class BotMenuBuilder {
   get() {
     return this;
   }
+
+  setOptions(options) {
+    this.options = options;
+    return this;
+  }
 }

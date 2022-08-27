@@ -1,3 +1,7 @@
+import {
+  CollectionProperties,
+  Expose,
+} from '@forlagshuset/nestjs-mongoose-paginate';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -69,4 +73,21 @@ export class CreateUserDto {
 
   @ApiProperty()
   eacNumber: string;
+}
+
+export class UserProperties extends CollectionProperties {
+  @Expose({ name: 'createdAt', sortable: true })
+  readonly createdAt: 'desc' | 'asc';
+
+  @Expose({ sortable: true, default: true, filterable: true })
+  readonly email: 'desc' | 'asc';
+
+  @Expose({ sortable: true, default: true, filterable: true })
+  readonly waBotPhone: 'desc' | 'asc';
+
+  @Expose({ sortable: true, default: true, filterable: true })
+  readonly firstName: 'desc' | 'asc';
+
+  @Expose({ sortable: true, default: true, filterable: true })
+  readonly lastName: 'desc' | 'asc';
 }

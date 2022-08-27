@@ -10,5 +10,6 @@ import { Listing, ListingSchema } from './entities/listing.entity';
   ],
   controllers: [ListingController],
   providers: [ListingService],
+  exports: [ListingService],
 })
 export class ListingModule {}

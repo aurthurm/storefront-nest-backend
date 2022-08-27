@@ -1,15 +1,20 @@
 import { Injectable } from '@nestjs/common';
+import { ListingService } from 'src/resources/listing/listing.service';
 import { UserService } from 'src/resources/user/user.service';
 
 @Injectable()
 export class BotAccountService {
   constructor(private userService: UserService) {}
 
-  async createAccount(source: string, pin: string, active: boolean) {
-    // rewuired for users created via listings
+  async createOrUpdateAccount(source: string, pin: string, active: boolean) {
+    // rewired for users created via listings
     const account = await this.userService.getUserBySource(source);
-    if (account) return account;
-    // create
+    if (account) {
+      account.pin = pin;
+      account.botActive = active;
+      account.status = 'active';
+      return await this.userService.update(account._id, account);
+    }
     return await this.userService.createBotAccount(source, pin, active);
   }
 
@@ -55,8 +60,11 @@ export class BotAccountService {
     return false;
   }
 
-  async checkIfAccountExists(source: string) {
-    //
+  async getAccount(source: string) {
     return await this.userService.getUserBySource(source);
+  }
+
+  async checkIfAccountExists(source: string) {
+    return await this.getAccount(source);
   }
 }

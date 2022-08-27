@@ -7,6 +7,7 @@ import { BotAccountService } from 'src/providers/bot-account/bot-account.service
 import { UserModule } from '../user/user.module';
 import { SmsService } from 'src/providers/sms/sms.service';
 import { HttpModule } from '@nestjs/axios';
+import { ListingModule } from '../listing/listing.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { HttpModule } from '@nestjs/axios';
       }),
     }),
     UserModule,
+    ListingModule,
   ],
   controllers: [BotController],
   providers: [BotService, BotAccountService, SmsService],
