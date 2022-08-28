@@ -2,6 +2,12 @@ export const jwtConstants = {
   secret: 'secretKey',
 };
 
+export const ReminderFrequencies = [
+  { key: 1, label: 'Every Day', frequency: 1 },
+  { key: 2, label: 'Every 2 Days', frequency: 2 },
+  { key: 3, label: 'Every Week', frequency: 5 },
+];
+
 export const UserRoles = ['SU_ADMIN', 'ADMIN', 'ADVERTISER'];
 
 export enum Role {
@@ -138,19 +144,23 @@ export const EnTranslations = {
 
   CONFIRM_DELETE_LISTING: {
     title: 'Confirm Delete Listing ',
-    options: [],
+    options: ['Y. Yes', 'N. No'],
     validation: new RegExp(/^y|n/),
-    validationResponse: 'Please ',
+    validationResponse: 'Please use Y for Yes and N for No',
     expectedResponses: ['y', 'n'],
     children: [],
   },
 
   CHANGE_REMINDER_FREQUENCY: {
     title: 'Change Reminder Frequency ',
-    options: [],
-    validation: new RegExp(/^/),
-    validationResponse: 'Please ',
-    expectedResponses: [],
+    options: ReminderFrequencies.map((freq, idx) => {
+      return `${freq.key}. ${freq.label}`;
+    }),
+    validation: new RegExp(/^[1-3]{1}$/),
+    validationResponse:
+      'Please choose options from ' +
+      ReminderFrequencies.map((freq) => freq.key),
+    expectedResponses: ReminderFrequencies.map((freq) => freq.key),
   },
 
   TENANT_SERVICES: {
@@ -214,13 +224,14 @@ export const EnTranslations = {
   },
 
   TERMINATE_LEASE: {
-    title: ' ',
+    title: 'Provide Lease Ref ',
     options: [],
     validation: new RegExp(/^/),
     validationResponse: 'Please ',
     expectedResponses: [],
     children: [],
   },
+
   SUPPORT: {
     title: ' ',
     options: [],
@@ -229,6 +240,7 @@ export const EnTranslations = {
     expectedResponses: [],
     children: [],
   },
+
   TERMINATE_BOT: {
     title: 'Thank you for using StoreFront Services ',
     options: [],

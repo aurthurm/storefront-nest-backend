@@ -45,4 +45,8 @@ export class ListingService {
   async remove(id: string) {
     return await this.listingModel.remove(id);
   }
+
+  async findOneAndDelete(payload = {}) {
+    return await this.listingModel.findOneAndDelete(payload);
+  }
 }

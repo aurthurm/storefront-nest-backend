@@ -255,7 +255,10 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((message: string) => {
+          .setAction(async (listingReference: string) => {
+            await this.updateBotSession({
+              'responses.listingReference': listingReference,
+            });
             return {
               success: true,
               message: '',
@@ -284,7 +287,118 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((message: string) => {
+          .setAction(async (confirm: string) => {
+            let success = false;
+            let message = '';
+            if (confirm.toLocaleLowerCase() === 'y') {
+              const user = await this.botAccountService.getAccount(this.source);
+              const { responses } = (await this.getCurrentSession(
+                this.source,
+              )) as any;
+              const deleted = await this.listingService.findOneAndDelete({
+                listingReference: responses['listingReference'],
+                advertiserId: user._id,
+              });
+              if (deleted === null) {
+                await this.moveBotCursor('2.2.1', '2', null);
+                message = `Listing with id  ${responses['listingReference']} not found`;
+              } else {
+                success = true;
+                message = `Listing with id  ${responses['listingReference']} was successfully deleted`;
+              }
+              console.log(deleted);
+            } else {
+              success = true;
+              await this.moveBotCursor('2.2.1', '2', null);
+            }
+
+            return {
+              success,
+              message,
+            };
+          });
+      }
+
+      // CHANGE_REMINDER_FREQUENCY
+      case '2.3.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.CHANGE_REMINDER_FREQUENCY;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2',
+          '2.3.1',
+          '2',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((selected: string) => {
+            return {
+              success: true,
+              message: 'You selected ' + selected,
+            };
+          });
+      }
+
+      // TENANT_SERVICES
+      case '2.4.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.TENANT_SERVICES;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2',
+          '2.4.1',
+          '2',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((selected: string) => {
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // TERMINATE_LEASE
+      case '2.5.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.TERMINATE_LEASE;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2',
+          '2.5.1',
+          '2',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((selected: string) => {
             return {
               success: true,
               message: '',
