@@ -2,7 +2,7 @@ import { Role } from './constants';
 
 export const SUPER_USER = {
   userName: 'admin',
-  email: 'admin@instore.com',
+  email: 'admin@storefront.systems',
   firstName: 'Admin',
   lastName: 'Admin',
   middleName: '',
