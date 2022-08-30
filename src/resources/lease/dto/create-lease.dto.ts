@@ -13,4 +13,6 @@ export class CreateLeaseDto {
   endDate: string;
   @ApiProperty()
   comment: string;
+  @ApiProperty()
+  code: number;
 }

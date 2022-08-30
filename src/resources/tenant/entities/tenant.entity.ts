@@ -7,9 +7,17 @@ export type TenantDocument = Tenant & Document;
 })
 export class Tenant {
   @Prop()
+  idNumber: string;
+  @Prop()
+  passportNumber: string;
+  @Prop()
+  phoneNumber: string;
+  @Prop()
   firstName: string;
   @Prop()
   lastName: string;
+  @Prop()
+  gender: string;
   @Prop()
   fullName: string;
   @Prop()

@@ -182,8 +182,94 @@ export const EnTranslations = {
     title: 'Create Tenant ',
     options: [],
     validation: new RegExp(/^/),
-    validationResponse: 'Please ',
+    validationResponse: '',
     expectedResponses: [],
+    children: [],
+  },
+
+  GET_TENANT_FIRST_NAME: {
+    title: 'Enter Tenant First Name',
+    options: [],
+    validation: new RegExp(/^[a-zA-Z ]+$/),
+    validationResponse: 'Please use characters Az-Zz ',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_TENANT_LAST_NAME: {
+    title: 'Enter Tenant Last Name',
+    options: [],
+    validation: new RegExp(/^[a-zA-Z ]+$/),
+    validationResponse: 'Please use characters Az-Zz ',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_TENANT_GENDER: {
+    title: 'Enter Tenant Gender',
+    options: ['M. Male', 'F. Female'],
+    validation: new RegExp(/^m|f/),
+    validationResponse: 'Please use M for male and F for Female',
+    expectedResponses: ['m', 'f'],
+    children: [],
+  },
+
+  GET_TENANT_PHONE: {
+    title: 'Enter Tenant Phone',
+    options: [],
+    validation: new RegExp(/^(263|0)7[7-8|1|3][0-9]{7}$/),
+    validationResponse:
+      'Please A valid phone number starting with 236XXXXXXXXX',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_TENANT_IDENTIFICATION: {
+    title: 'Enter Tenant Identification',
+    options: ['(Passport/ID Number)'],
+    validation: new RegExp(/^([a-zA-Z0-9 _-]+)$/),
+    validationResponse: '',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_AVAILABLE_LISTINGS: {
+    title: 'From My Listings',
+    options: [],
+    validation: new RegExp(/^/),
+    validationResponse: '',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_TENANT_LEASE_START_DATE: {
+    title: 'Tenant Lease Start Date',
+    options: [],
+    validation: new RegExp(
+      /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
+    ),
+    validationResponse: 'Required Date Format: dd-mm-yyyy',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_TENANT_LEASE_END_DATE: {
+    title: 'Tenant Lease End Date',
+    options: [],
+    validation: new RegExp(
+      /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
+    ),
+    validationResponse: 'Required Date Format: dd-mm-yyyy',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_TENANT_CONFIRM_LEASE: {
+    title: 'Confirm Tenant Lease',
+    options: ['Y. Yes', 'N. No'],
+    validation: new RegExp(/^y|n/),
+    validationResponse: 'Please use Y for Yes and N for No',
+    expectedResponses: ['y', 'n'],
     children: [],
   },
 
@@ -261,6 +347,15 @@ const MENU_MAPPINGS = {
   '2.3.1': EnTranslations.CHANGE_REMINDER_FREQUENCY,
   '2.4': 'Tenant Service',
   '2.4.1': EnTranslations.CREATE_TENANT,
+  '2.4.1.1': EnTranslations.GET_TENANT_FIRST_NAME,
+  '2.4.1.2': EnTranslations.GET_TENANT_LAST_NAME,
+  '2.4.1.3': EnTranslations.GET_TENANT_GENDER,
+  '2.4.1.4': EnTranslations.GET_TENANT_PHONE,
+  '2.4.1.5': EnTranslations.GET_TENANT_IDENTIFICATION,
+  '2.4.1.6': EnTranslations.GET_AVAILABLE_LISTINGS,
+  '2.4.1.7': EnTranslations.GET_TENANT_LEASE_START_DATE,
+  '2.4.1.8': EnTranslations.GET_TENANT_LEASE_END_DATE,
+  '2.4.1.9': EnTranslations.GET_TENANT_CONFIRM_LEASE,
   '2.4.2': EnTranslations.CONFIRM_TENANT,
   '2.4.3': EnTranslations.TENANT_STATUS,
   '2.4.4': EnTranslations.CLEAR_TENANT,

@@ -8,6 +8,10 @@ import { BotAccountService } from 'src/providers/bot-account/bot-account.service
 import { OTPGenerator } from 'src/helpers/otp.generator';
 import { SmsService } from 'src/providers/sms/sms.service';
 import { ListingService } from '../listing/listing.service';
+import { TenantService } from '../tenant/tenant.service';
+import { CreateTenantDto } from '../tenant/dto/create-tenant.dto';
+import { LeaseService } from '../lease/lease.service';
+import { CreateLeaseDto } from '../lease/dto/create-lease.dto';
 
 @Injectable()
 export class BotService {
@@ -20,6 +24,8 @@ export class BotService {
     private botAccountService: BotAccountService,
     private smsService: SmsService,
     private listingService: ListingService,
+    private tenantService: TenantService,
+    private leaseService: LeaseService,
   ) {}
   //
 
@@ -363,13 +369,355 @@ export class BotService {
           options,
           '2',
           '2.4.1',
-          '2',
+          '2.4.1.1',
           validation,
           validationResponse,
           expectedResponses,
         )
           .get()
           .setAction((selected: string) => {
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_FIRST_NAME
+      case '2.4.1.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_FIRST_NAME;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1',
+          '2.4.1.1',
+          '2.4.1.2',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((firstName: string) => {
+            this.updateBotSession({
+              'responses.get_tenant_first_name': firstName,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_LAST_NAME
+      case '2.4.1.2': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_LAST_NAME;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1.1',
+          '2.4.1.2',
+          '2.4.1.3',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((lastName: string) => {
+            this.updateBotSession({
+              'responses.get_tenant_last_name': lastName,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_GENDER
+      case '2.4.1.3': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_GENDER;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1.2',
+          '2.4.1.3',
+          '2.4.1.4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((gender: string) => {
+            this.updateBotSession({
+              'responses.get_tenant_gender': gender,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_PHONE
+      case '2.4.1.4': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_PHONE;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1.3',
+          '2.4.1.4',
+          '2.4.1.5',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((phone: string) => {
+            this.updateBotSession({
+              'responses.get_tenant_phone': phone,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_IDENTIFICATION
+      case '2.4.1.5': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_IDENTIFICATION;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1.4',
+          '2.4.1.5',
+          '2.4.1.6',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((identification: string) => {
+            this.updateBotSession({
+              'responses.get_tenant_identification': identification,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_AVAILABLE_LISTINGS
+      case '2.4.1.6': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_AVAILABLE_LISTINGS;
+
+        const toReadableDate = (d) => new Date(d).toLocaleDateString();
+        const options2 = (await this.getListings()).map((listing, i) => {
+          return `${listing.listingReference}. ${listing.listingReference} ${
+            listing.address
+          } valid until ${toReadableDate(listing.expirationDate)}`;
+        });
+
+        return new BotMenuBuilder(
+          title,
+          options2,
+          '2.4.1.5',
+          '2.4.1.6',
+          '2.4.1.7',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((listing: string) => {
+            this.updateBotSession({
+              'responses.get_tenant_listing': listing,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_LEASE_START_DATE
+      case '2.4.1.7': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_LEASE_START_DATE;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1.6',
+          '2.4.1.7',
+          '2.4.1.8',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((startDate: string) => {
+            this.updateBotSession({
+              'responses.get_lease_start_date': startDate,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_LEASE_END_DATE
+      case '2.4.1.8': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_LEASE_END_DATE;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1.7',
+          '2.4.1.8',
+          '2.4.1.9',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((endDate: string) => {
+            this.updateBotSession({
+              'responses.get_lease_end_date': endDate,
+            });
+            return {
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_TENANT_CONFIRM_LEASE
+      case '2.4.1.9': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_CONFIRM_LEASE;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1.8',
+          '2.4.1.9',
+          '2.4.1',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (confirm: string) => {
+            this.updateBotSession({
+              'responses.get_confirm_lease': confirm,
+            });
+            //
+            const user = await this.botAccountService.getAccount(this.source);
+            const { responses } = (await this.getCurrentSession(
+              this.source,
+            )) as any;
+            //
+
+            if (confirm.toLocaleLowerCase() === 'y') {
+              // Create Tenant
+              const tenantDto = new CreateTenantDto();
+              tenantDto.firstName = responses['get_tenant_first_name'];
+              tenantDto.lastName = responses['get_tenant_last_name'];
+              tenantDto.gender = responses['get_tenant_gender']; // ?
+              tenantDto.phoneNumber = responses['get_tenant_phone'];
+              tenantDto.idNumber = responses['get_tenant_identification'];
+              const tenant = await this.tenantService.create(tenantDto);
+
+              // get selected listing
+              let listing: any = await this.listingService.findAll({
+                listingReference: responses['get_tenant_listing'],
+                advertiserId: user._id,
+              });
+              if (listing.length) {
+                listing = listing[0];
+              }
+              // OTP gen
+              const code = new OTPGenerator().generateOTP(6);
+              // Create Lease
+              const leaseDTO = new CreateLeaseDto();
+              leaseDTO.userId = user._id;
+              leaseDTO.tenantId = tenant._id.toString();
+              leaseDTO.listingId = listing._id;
+              leaseDTO.startDate = responses['get_lease_start_date'];
+              leaseDTO.endDate = responses['get_lease_end_date'];
+              leaseDTO.comment = '';
+              leaseDTO.code = +code;
+              const lease = this.leaseService.create(leaseDTO);
+              // send sms
+
+              console.log('Lease tenant confirmation code: ', code);
+              this.smsService.sendSMS(
+                [this.source],
+                `Your lease confirmation code is ${code}`,
+              );
+            } else {
+            }
+
             return {
               success: true,
               message: '',

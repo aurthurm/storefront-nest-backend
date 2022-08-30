@@ -18,6 +18,8 @@ export class Lease {
   endDate: string;
   @Prop()
   comment: string;
+  @Prop()
+  code: number;
 }
 
 export const LeaseSchema = SchemaFactory.createForClass(Lease);

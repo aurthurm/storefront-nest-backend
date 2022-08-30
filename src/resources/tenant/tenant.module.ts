@@ -10,5 +10,6 @@ import { Tenant, TenantSchema } from './entities/tenant.entity';
   ],
   controllers: [TenantController],
   providers: [TenantService],
+  exports: [TenantService],
 })
 export class TenantModule {}

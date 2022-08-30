@@ -8,6 +8,8 @@ import { UserModule } from '../user/user.module';
 import { SmsService } from 'src/providers/sms/sms.service';
 import { HttpModule } from '@nestjs/axios';
 import { ListingModule } from '../listing/listing.module';
+import { TenantModule } from '../tenant/tenant.module';
+import { LeaseModule } from '../lease/lease.module';
 
 @Module({
   imports: [
@@ -20,9 +22,12 @@ import { ListingModule } from '../listing/listing.module';
     }),
     UserModule,
     ListingModule,
+    TenantModule,
+    LeaseModule,
   ],
   controllers: [BotController],
   providers: [BotService, BotAccountService, SmsService],
+
   exports: [BotService],
 })
 export class BotModule {}

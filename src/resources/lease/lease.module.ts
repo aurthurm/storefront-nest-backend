@@ -10,5 +10,6 @@ import { Lease, LeaseSchema } from './entities/lease.entity';
   ],
   controllers: [LeaseController],
   providers: [LeaseService],
+  exports: [LeaseService],
 })
 export class LeaseModule {}
