@@ -107,13 +107,11 @@ export const EnTranslations = {
     children: [],
   },
 
-
   CHANGE_ACCOUNT_NUMBER: {
     title: 'Enter phone number',
     options: [],
     validation: new RegExp(/^/),
-    validationResponse:
-      '',
+    validationResponse: '',
     expectedResponses: [],
     children: [],
   },
