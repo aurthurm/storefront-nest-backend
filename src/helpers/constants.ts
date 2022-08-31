@@ -107,6 +107,17 @@ export const EnTranslations = {
     children: [],
   },
 
+
+  CHANGE_ACCOUNT_NUMBER: {
+    title: 'Enter phone number',
+    options: [],
+    validation: new RegExp(/^/),
+    validationResponse:
+      '',
+    expectedResponses: [],
+    children: [],
+  },
+
   MAIN_MENU: {
     title: 'Main Menu',
     options: [
@@ -319,8 +330,8 @@ export const EnTranslations = {
   },
 
   SUPPORT: {
-    title: ' ',
-    options: [],
+    title: 'Leave a message ',
+    options: ['One of our agents will contact you'],
     validation: new RegExp(/^/),
     validationResponse: 'Please ',
     expectedResponses: [],

@@ -26,7 +26,7 @@ export class BotService {
     private listingService: ListingService,
     private tenantService: TenantService,
     private leaseService: LeaseService,
-  ) {}
+  ) { }
   //
 
   async getWhatsAppResponse(source: string, message: string) {
@@ -216,9 +216,8 @@ export class BotService {
 
         const toReadableDate = (d) => new Date(d).toLocaleDateString();
         const options2 = (await this.getListings()).map((listing, i) => {
-          return `${listing.listingReference}. ${listing.listingReference} ${
-            listing.address
-          } valid until ${toReadableDate(listing.expirationDate)}`;
+          return `${listing.listingReference}. ${listing.listingReference} ${listing.address
+            } valid until ${toReadableDate(listing.expirationDate)}`;
         });
 
         return new BotMenuBuilder(
@@ -555,9 +554,8 @@ export class BotService {
 
         const toReadableDate = (d) => new Date(d).toLocaleDateString();
         const options2 = (await this.getListings()).map((listing, i) => {
-          return `${listing.listingReference}. ${listing.listingReference} ${
-            listing.address
-          } valid until ${toReadableDate(listing.expirationDate)}`;
+          return `${listing.listingReference}. ${listing.listingReference} ${listing.address
+            } valid until ${toReadableDate(listing.expirationDate)}`;
         });
 
         return new BotMenuBuilder(
@@ -917,6 +915,63 @@ export class BotService {
             return {
               success,
               message: success ? successMessage : 'Pins do not match',
+            };
+          });
+      }
+
+      // CHANGE_ACCOUNT
+      case '3.3.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.CHANGE_ACCOUNT_NUMBER;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3',
+          '3.3.1',
+          '3',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (message: string) => {
+            return {
+              success: true,
+              message: ' ',
+            };
+          });
+      }
+
+      // SUPPORT
+      case '3.4.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.SUPPORT;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3',
+          '3.4.1',
+          '3',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (message: string) => {
+
+            return {
+              success: true,
+              message: ' ',
             };
           });
       }
