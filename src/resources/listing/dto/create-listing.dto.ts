@@ -46,6 +46,12 @@ export class CreateListingDto {
 
   @ApiProperty()
   subscriptionId: string;
+
+  @ApiProperty()
+  leaseId: string;
+
+  @ApiProperty()
+  status: string;
 }
 
 export class ListingProperties extends CollectionProperties {

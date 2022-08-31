@@ -72,6 +72,7 @@ export class BotService {
     }
 
     this.menu = await this.menuResolver(botSession.currentMenu);
+    console.log(this.menu);
     const isValidResponse = this.validateMenuResponse(message);
 
     if (isValidResponse) {
@@ -554,11 +555,19 @@ export class BotService {
         } = EnTranslations.GET_AVAILABLE_LISTINGS;
 
         const toReadableDate = (d) => new Date(d).toLocaleDateString();
-        const options2 = (await this.getListings()).map((listing, i) => {
+        const listings = await this.getListings({
+          status: 'available',
+        });
+
+        const listingRefs = listings.map((listing) => listing.listingReference);
+        const options2 = listings.map((listing) => {
           return `${listing.listingReference}. ${listing.listingReference} ${
             listing.address
           } valid until ${toReadableDate(listing.expirationDate)}`;
         });
+
+        console.log(listingRefs);
+        console.log(options2);
 
         return new BotMenuBuilder(
           title,
@@ -567,8 +576,8 @@ export class BotService {
           '2.4.1.6',
           '2.4.1.7',
           validation,
-          validationResponse,
-          expectedResponses,
+          'Please select a valid Listing reference',
+          listingRefs,
         )
           .get()
           .setAction((listing: string) => {
@@ -661,7 +670,7 @@ export class BotService {
           options,
           '2.4.1.8',
           '2.4.1.9',
-          '2.4.1',
+          '4',
           validation,
           validationResponse,
           expectedResponses,
@@ -677,7 +686,7 @@ export class BotService {
               this.source,
             )) as any;
             //
-
+            let message;
             if (confirm.toLocaleLowerCase() === 'y') {
               // Create Tenant
               const tenantDto = new CreateTenantDto();
@@ -707,20 +716,34 @@ export class BotService {
               leaseDTO.endDate = responses['get_lease_end_date'];
               leaseDTO.comment = '';
               leaseDTO.code = +code;
-              const lease = this.leaseService.create(leaseDTO);
+              const lease = await this.leaseService.create(leaseDTO);
+              // update listing
+              listing.status = 'pending';
+              listing.leaseId = lease._id.toString();
+              await this.listingService.update(listing._id, listing);
+
               // send sms
 
-              console.log('Lease tenant confirmation code: ', code);
               this.smsService.sendSMS(
-                [this.source],
-                `Your lease confirmation code is ${code}`,
+                [tenantDto.phoneNumber],
+                `Dear Tenant ID ${tenantDto.idNumber} please send Confirmation Code ${code} to your new Landlord to
+                complete your Lease Registration Process. Please note the code is valid for 24 hours.`,
               );
+
+              message = `Thank you for confirming Tenant ${tenantDto.idNumber} an SMS has been sent to the Tenant for
+              confirmation please Text 'Hi' to access Main Menu and select 'Confirm Tenant' Menu to enter
+              Tenant Confirm Code to complete the process your Tenant Subscription Services are valid until
+              03.04.22 / inactive (if inactive please send a message “Hi” and select Subscribe from the Main Menu`;
             } else {
+              message = `Your current session has been cancelled to access the Main Menu please send “Hi” and select
+              preferred service thank you for using StoreFront Services your Tenant Services subscription are valid
+              until 03.04.22” / inactive (if inactive please send a message “Hi” and select Subscribe from the Main
+              Menu`;
             }
 
             return {
               success: true,
-              message: '',
+              message,
             };
           });
       }
@@ -958,11 +981,16 @@ export class BotService {
   }
 
   validateMenuResponse(message: string) {
+    console.log(message);
+    console.log(this.menu.ExpectedResponses);
     const matched = this.menu.ExpectedResponses.filter((resp: any) => {
       return resp.toString().toLowerCase() === message.toLowerCase();
     });
+    console.log(matched);
     if (matched.length > 0) {
       return true;
+    } else if (this.menu.ExpectedResponses.length > 0) {
+      return false;
     }
     return this.menu.Validation.test(message);
   }
@@ -1011,10 +1039,11 @@ export class BotService {
     return +responses['otp'] === +pin;
   }
 
-  async getListings() {
+  async getListings(query = {}) {
     const user = await this.botAccountService.getAccount(this.source);
     return await this.listingService.findAll({
       advertiserId: user._id,
+      ...query,
     });
   }
 }

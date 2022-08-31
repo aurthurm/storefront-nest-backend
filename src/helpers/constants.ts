@@ -335,6 +335,15 @@ export const EnTranslations = {
     expectedResponses: [''],
     children: [],
   },
+
+  NOTIFICATION: {
+    title: '',
+    options: [],
+    validation: new RegExp(/^/),
+    validationResponse: '',
+    expectedResponses: [''],
+    children: [],
+  },
 };
 
 const MENU_MAPPINGS = {
@@ -370,4 +379,5 @@ const MENU_MAPPINGS = {
   '3.3.1': 'Change account',
   '3.4.1': 'Support',
   '4': EnTranslations.TERMINATE_BOT,
+  '5': EnTranslations.NOTIFICATION,
 };

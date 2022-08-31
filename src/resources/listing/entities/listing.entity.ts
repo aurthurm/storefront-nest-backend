@@ -47,6 +47,12 @@ export class Listing {
 
   @Prop()
   subscriptionId: string;
+
+  @Prop()
+  leaseId: string;
+
+  @Prop({ default: 'available' })
+  status: string;
 }
 
 const _ListingSchema = SchemaFactory.createForClass(Listing);
