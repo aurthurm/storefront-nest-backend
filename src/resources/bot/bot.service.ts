@@ -566,9 +566,6 @@ export class BotService {
           } valid until ${toReadableDate(listing.expirationDate)}`;
         });
 
-        console.log(listingRefs);
-        console.log(options2);
-
         return new BotMenuBuilder(
           title,
           options2,
@@ -940,6 +937,62 @@ export class BotService {
             return {
               success,
               message: success ? successMessage : 'Pins do not match',
+            };
+          });
+      }
+
+      // CHANGE_ACCOUNT
+      case '3.3.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.CHANGE_ACCOUNT_NUMBER;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3',
+          '3.3.1',
+          '4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (message: string) => {
+            return {
+              success: true,
+              message: ' ',
+            };
+          });
+      }
+
+      // SUPPORT
+      case '3.4.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.SUPPORT;
+        return new BotMenuBuilder(
+          title,
+          options,
+          '3',
+          '3.4.1',
+          '4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (message: string) => {
+            return {
+              success: true,
+              message: ' ',
             };
           });
       }
