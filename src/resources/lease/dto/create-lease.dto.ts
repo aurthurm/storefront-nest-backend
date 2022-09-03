@@ -15,4 +15,6 @@ export class CreateLeaseDto {
   comment: string;
   @ApiProperty()
   code: number;
+  @ApiProperty()
+  codeExpiry: Date;
 }

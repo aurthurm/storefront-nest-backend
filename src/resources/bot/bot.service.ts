@@ -72,7 +72,6 @@ export class BotService {
     }
 
     this.menu = await this.menuResolver(botSession.currentMenu);
-    console.log(this.menu);
     const isValidResponse = this.validateMenuResponse(message);
 
     if (isValidResponse) {
@@ -80,6 +79,7 @@ export class BotService {
 
       if (nextMenu === null) {
         nextMenu = botSession.currentMenu + `.${message}.1`;
+        console.log(nextMenu);
       }
 
       // fire relative action
@@ -197,7 +197,6 @@ export class BotService {
         )
           .get()
           .setAction((message: string) => {
-            console.log('Action fired', message);
             return {
               success: true,
               message: '',
@@ -313,7 +312,6 @@ export class BotService {
                 success = true;
                 message = `Listing with id  ${responses['listingReference']} was successfully deleted`;
               }
-              console.log(deleted);
             } else {
               success = true;
               await this.moveBotCursor('2.2.1', '2', null);
@@ -370,7 +368,7 @@ export class BotService {
           options,
           '2',
           '2.4.1',
-          '2.4.1.1',
+          null,
           validation,
           validationResponse,
           expectedResponses,
@@ -385,7 +383,7 @@ export class BotService {
       }
 
       // GET_TENANT_FIRST_NAME
-      case '2.4.1.1': {
+      case '2.4.1.1.1': {
         const {
           title,
           options,
@@ -398,8 +396,8 @@ export class BotService {
           title,
           options,
           '2.4.1',
-          '2.4.1.1',
-          '2.4.1.2',
+          '2.4.1.1.1',
+          '2.4.1.1.2',
           validation,
           validationResponse,
           expectedResponses,
@@ -417,7 +415,7 @@ export class BotService {
       }
 
       // GET_TENANT_LAST_NAME
-      case '2.4.1.2': {
+      case '2.4.1.1.2': {
         const {
           title,
           options,
@@ -429,9 +427,9 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          '2.4.1.1',
-          '2.4.1.2',
-          '2.4.1.3',
+          '2.4.1.1.1',
+          '2.4.1.1.2',
+          '2.4.1.1.3',
           validation,
           validationResponse,
           expectedResponses,
@@ -449,7 +447,7 @@ export class BotService {
       }
 
       // GET_TENANT_GENDER
-      case '2.4.1.3': {
+      case '2.4.1.1.3': {
         const {
           title,
           options,
@@ -461,9 +459,9 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          '2.4.1.2',
-          '2.4.1.3',
-          '2.4.1.4',
+          '2.4.1.1.2',
+          '2.4.1.1.3',
+          '2.4.1.1.4',
           validation,
           validationResponse,
           expectedResponses,
@@ -481,7 +479,7 @@ export class BotService {
       }
 
       // GET_TENANT_PHONE
-      case '2.4.1.4': {
+      case '2.4.1.1.4': {
         const {
           title,
           options,
@@ -493,9 +491,9 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          '2.4.1.3',
-          '2.4.1.4',
-          '2.4.1.5',
+          '2.4.1.1.3',
+          '2.4.1.1.4',
+          '2.4.1.1.5',
           validation,
           validationResponse,
           expectedResponses,
@@ -513,7 +511,7 @@ export class BotService {
       }
 
       // GET_TENANT_IDENTIFICATION
-      case '2.4.1.5': {
+      case '2.4.1.1.5': {
         const {
           title,
           options,
@@ -525,9 +523,9 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          '2.4.1.4',
-          '2.4.1.5',
-          '2.4.1.6',
+          '2.4.1.1.4',
+          '2.4.1.1.5',
+          '2.4.1.1.6',
           validation,
           validationResponse,
           expectedResponses,
@@ -545,7 +543,7 @@ export class BotService {
       }
 
       // GET_AVAILABLE_LISTINGS
-      case '2.4.1.6': {
+      case '2.4.1.1.6': {
         const {
           title,
           options,
@@ -569,9 +567,9 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options2,
-          '2.4.1.5',
-          '2.4.1.6',
-          '2.4.1.7',
+          '2.4.1.1.5',
+          '2.4.1.1.6',
+          '2.4.1.1.7',
           validation,
           'Please select a valid Listing reference',
           listingRefs,
@@ -589,7 +587,7 @@ export class BotService {
       }
 
       // GET_TENANT_LEASE_START_DATE
-      case '2.4.1.7': {
+      case '2.4.1.1.7': {
         const {
           title,
           options,
@@ -601,9 +599,9 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          '2.4.1.6',
-          '2.4.1.7',
-          '2.4.1.8',
+          '2.4.1.1.6',
+          '2.4.1.1.7',
+          '2.4.1.1.8',
           validation,
           validationResponse,
           expectedResponses,
@@ -621,7 +619,7 @@ export class BotService {
       }
 
       // GET_TENANT_LEASE_END_DATE
-      case '2.4.1.8': {
+      case '2.4.1.1.8': {
         const {
           title,
           options,
@@ -633,9 +631,9 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          '2.4.1.7',
-          '2.4.1.8',
-          '2.4.1.9',
+          '2.4.1.1.7',
+          '2.4.1.1.8',
+          '2.4.1.1.9',
           validation,
           validationResponse,
           expectedResponses,
@@ -653,7 +651,7 @@ export class BotService {
       }
 
       // GET_TENANT_CONFIRM_LEASE
-      case '2.4.1.9': {
+      case '2.4.1.1.9': {
         const {
           title,
           options,
@@ -665,8 +663,8 @@ export class BotService {
         return new BotMenuBuilder(
           title,
           options,
-          '2.4.1.8',
-          '2.4.1.9',
+          '2.4.1.1.8',
+          '2.4.1.1.9',
           '4',
           validation,
           validationResponse,
@@ -713,6 +711,7 @@ export class BotService {
               leaseDTO.endDate = responses['get_lease_end_date'];
               leaseDTO.comment = '';
               leaseDTO.code = +code;
+              leaseDTO.codeExpiry = new Date(+new Date() + 86400000);
               const lease = await this.leaseService.create(leaseDTO);
               // update listing
               listing.status = 'pending';
@@ -741,6 +740,37 @@ export class BotService {
             return {
               success: true,
               message,
+            };
+          });
+      }
+
+      case '2.4.1.2.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_TENANT_CONFIRMATION_CODE;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.4.1',
+          '2.4.1.2.1',
+          '2.4.1',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction((code: string) => {
+            this.updateBotSession({
+              'responses.get_lease_confirmation': code,
+            });
+            return {
+              success: true,
+              message: 'Yay !!!!!',
             };
           });
       }
@@ -1034,12 +1064,9 @@ export class BotService {
   }
 
   validateMenuResponse(message: string) {
-    console.log(message);
-    console.log(this.menu.ExpectedResponses);
     const matched = this.menu.ExpectedResponses.filter((resp: any) => {
       return resp.toString().toLowerCase() === message.toLowerCase();
     });
-    console.log(matched);
     if (matched.length > 0) {
       return true;
     } else if (this.menu.ExpectedResponses.length > 0) {

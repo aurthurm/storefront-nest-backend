@@ -181,8 +181,8 @@ export const EnTranslations = {
       '4. Tenant Clearing Check',
       '5. Blacklist / Unblacklist Tenant',
     ],
-    validation: new RegExp(/^/),
-    validationResponse: 'Please ',
+    validation: new RegExp(/^[1-5]{1}$/),
+    validationResponse: 'Please select from 1-5',
     expectedResponses: [],
     children: [],
   },
@@ -291,6 +291,15 @@ export const EnTranslations = {
     children: [],
   },
 
+  GET_TENANT_CONFIRMATION_CODE: {
+    title: 'Enter Tenant Confirmation Code',
+    options: [],
+    validation: new RegExp(/^[0-9]{6}$/),
+    validationResponse: '',
+    expectedResponses: [],
+    children: [],
+  },
+
   TENANT_STATUS: {
     title: ' ',
     options: [],
@@ -375,6 +384,7 @@ const MENU_MAPPINGS = {
   '2.4.1.8': EnTranslations.GET_TENANT_LEASE_END_DATE,
   '2.4.1.9': EnTranslations.GET_TENANT_CONFIRM_LEASE,
   '2.4.2': EnTranslations.CONFIRM_TENANT,
+  '2.4.2.1': EnTranslations.GET_TENANT_CONFIRMATION_CODE,
   '2.4.3': EnTranslations.TENANT_STATUS,
   '2.4.4': EnTranslations.CLEAR_TENANT,
   '2.4.5': EnTranslations.BLACKLIST_TENANT,
