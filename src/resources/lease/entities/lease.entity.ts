@@ -22,6 +22,8 @@ export class Lease {
   code: number;
   @Prop()
   codeExpiry: Date;
+  @Prop()
+  status: string;
 }
 
 export const LeaseSchema = SchemaFactory.createForClass(Lease);

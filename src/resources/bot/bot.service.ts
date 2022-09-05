@@ -89,7 +89,9 @@ export class BotService {
         // Update session to progress to the next menu
         await this.moveBotCursor(botSession.currentMenu, nextMenu, null);
         //return next menu
-        if (+nextMenu === 4) {
+        if (+nextMenu === 4 || response.notify) {
+          //Check if response has notify and next menu should be notify
+          response.notify && (nextMenu = '5');
           return (
             await (await this.menuResolver(nextMenu)).exec(response.message)
           ).message;
@@ -135,6 +137,7 @@ export class BotService {
           .get()
           .setAction(() => {
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -170,6 +173,7 @@ export class BotService {
             );
 
             return {
+              notify: false,
               success,
               message: success ? '' : 'Invalid Pin: Try again',
             };
@@ -198,6 +202,7 @@ export class BotService {
           .get()
           .setAction((message: string) => {
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -234,6 +239,7 @@ export class BotService {
           .get()
           .setAction((message: string) => {
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -266,6 +272,7 @@ export class BotService {
               'responses.listingReference': listingReference,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -318,6 +325,7 @@ export class BotService {
             }
 
             return {
+              notify: false,
               success,
               message,
             };
@@ -347,6 +355,7 @@ export class BotService {
           .get()
           .setAction((selected: string) => {
             return {
+              notify: false,
               success: true,
               message: 'You selected ' + selected,
             };
@@ -376,6 +385,7 @@ export class BotService {
           .get()
           .setAction((selected: string) => {
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -408,6 +418,7 @@ export class BotService {
               'responses.get_tenant_first_name': firstName,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -440,6 +451,7 @@ export class BotService {
               'responses.get_tenant_last_name': lastName,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -472,6 +484,7 @@ export class BotService {
               'responses.get_tenant_gender': gender,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -504,6 +517,7 @@ export class BotService {
               'responses.get_tenant_phone': phone,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -536,6 +550,7 @@ export class BotService {
               'responses.get_tenant_identification': identification,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -580,6 +595,7 @@ export class BotService {
               'responses.get_tenant_listing': listing,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -612,6 +628,7 @@ export class BotService {
               'responses.get_lease_start_date': startDate,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -644,6 +661,7 @@ export class BotService {
               'responses.get_lease_end_date': endDate,
             });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -711,6 +729,7 @@ export class BotService {
               leaseDTO.endDate = responses['get_lease_end_date'];
               leaseDTO.comment = '';
               leaseDTO.code = +code;
+              leaseDTO.status = 'pending';
               leaseDTO.codeExpiry = new Date(+new Date() + 86400000);
               const lease = await this.leaseService.create(leaseDTO);
               // update listing
@@ -738,6 +757,7 @@ export class BotService {
             }
 
             return {
+              notify: false,
               success: true,
               message,
             };
@@ -764,13 +784,43 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction((code: string) => {
+          .setAction(async (code: string) => {
             this.updateBotSession({
               'responses.get_lease_confirmation': code,
             });
+            let message,
+              success = false;
+            const user = await this.botAccountService.getAccount(this.source);
+            let lease: any = await this.leaseService.findAll({
+              userId: user._id,
+              code,
+              status: 'pending',
+            });
+            if (lease.length) {
+              lease = lease[0];
+              // check if not expired
+              if (+new Date(lease.codeExpiry) > +new Date()) {
+                // lease confirmation code is valid
+                lease.status = 'confirmed';
+                success = true;
+                message = 'Confirmed ';
+              } else {
+                lease.status = 'expired';
+                message = 'The Lease verification code has expired';
+                // TODO: Discuss what to do when lease code has expired
+              }
+              await this.leaseService.update(lease._id, lease);
+            } else {
+              // No lease found
+              message = `Lease with verification code ${code} not found`;
+            }
+
+            console.log(lease);
+
             return {
-              success: true,
-              message: 'Yay !!!!!',
+              notify: true,
+              success,
+              message,
             };
           });
       }
@@ -798,6 +848,7 @@ export class BotService {
           .get()
           .setAction((selected: string) => {
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -836,6 +887,7 @@ export class BotService {
             );
 
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -866,6 +918,7 @@ export class BotService {
             this.updateBotSession({ 'responses.otp_confirmation': +pin });
             const success = await this.confirmExistingPhonePin(+pin);
             return {
+              notify: false,
               success,
               message: success ? '' : 'Invalid OTP',
             };
@@ -896,6 +949,7 @@ export class BotService {
             this.updateBotSession({ 'responses.otp_confirmation': +pin });
             const success = await this.confirmExistingPhonePin(+pin);
             return {
+              notify: false,
               success,
               message: success ? '' : 'Invalid OTP',
             };
@@ -925,6 +979,7 @@ export class BotService {
           .setAction((pin: string) => {
             this.updateBotSession({ 'responses.get_pin': pin });
             return {
+              notify: false,
               success: true,
               message: '',
             };
@@ -965,6 +1020,7 @@ export class BotService {
 
             const successMessage = `Thank you for activating account ${this.source} please text Hi and Login with 4 digit pin for assistance please contact our support from the main menu`;
             return {
+              notify: false,
               success,
               message: success ? successMessage : 'Pins do not match',
             };
@@ -993,6 +1049,7 @@ export class BotService {
           .get()
           .setAction(async (message: string) => {
             return {
+              notify: false,
               success: true,
               message: ' ',
             };
@@ -1021,6 +1078,7 @@ export class BotService {
           .get()
           .setAction(async (message: string) => {
             return {
+              notify: false,
               success: true,
               message: ' ',
             };
@@ -1053,6 +1111,35 @@ export class BotService {
               menuLock: false,
             });
             return {
+              notify: false,
+              success: true,
+              message: message,
+            };
+          });
+      }
+
+      case '5': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.NOTIFICATION;
+        return new BotMenuBuilder(
+          title,
+          options,
+          null,
+          null,
+          null,
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (message: string) => {
+            return {
+              notify: false,
               success: true,
               message: message,
             };

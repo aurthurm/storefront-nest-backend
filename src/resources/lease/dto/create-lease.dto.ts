@@ -17,4 +17,6 @@ export class CreateLeaseDto {
   code: number;
   @ApiProperty()
   codeExpiry: Date;
+  @ApiProperty()
+  status: string;
 }
