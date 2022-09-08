@@ -13,6 +13,9 @@ export class SubscriptionType {
   title: string;
 
   @Prop()
+  userType: string;
+
+  @Prop()
   description: string;
 
   @Prop()

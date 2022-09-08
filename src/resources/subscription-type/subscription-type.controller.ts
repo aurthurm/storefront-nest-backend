@@ -6,11 +6,20 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { SubscriptionTypeService } from './subscription-type.service';
-import { CreateSubscriptionTypeDto } from './dto/create-subscription-type.dto';
+import {
+  CreateSubscriptionTypeDto,
+  SubscriptionTypeProperties,
+} from './dto/create-subscription-type.dto';
 import { UpdateSubscriptionTypeDto } from './dto/update-subscription-type.dto';
 import { ApiTags } from '@nestjs/swagger';
+import {
+  CollectionResponse,
+  ValidationPipe,
+} from '@forlagshuset/nestjs-mongoose-paginate';
+import { SubscriptionTypeDocument } from './entities/subscription-type.entity';
 
 @Controller('subscription-type')
 @ApiTags('subscription-type')
@@ -21,12 +30,21 @@ export class SubscriptionTypeController {
 
   @Post()
   create(@Body() createSubscriptionTypeDto: CreateSubscriptionTypeDto) {
-    return this.subscriptionTypeService.create(createSubscriptionTypeDto);
+    return {
+      data: this.subscriptionTypeService.create(createSubscriptionTypeDto),
+    };
   }
 
   @Get()
   findAll() {
-    return this.subscriptionTypeService.findAll();
+    return { data: this.subscriptionTypeService.findAll() };
+  }
+
+  @Get('filter')
+  filter(
+    @Query(new ValidationPipe(SubscriptionTypeProperties)) collectionDto: any,
+  ): Promise<CollectionResponse<SubscriptionTypeDocument>> {
+    return this.subscriptionTypeService.filter(collectionDto);
   }
 
   @Get(':id')
