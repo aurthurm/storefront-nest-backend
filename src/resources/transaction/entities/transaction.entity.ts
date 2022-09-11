@@ -1,4 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Subscription } from 'src/resources/subscription/entities/subscription.entity';
 
 export type TransactionDocument = Transaction & Document;
 
@@ -23,5 +24,14 @@ export class Transaction {
 
   @Prop()
   user: string;
+
+  @Prop({ type: Subscription })
+  subscription: Subscription;
+
+  @Prop({ type: Object })
+  paynowResponse: any;
+
+  @Prop({ type: Object })
+  pollResults: any;
 }
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

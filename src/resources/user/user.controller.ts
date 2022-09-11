@@ -42,7 +42,7 @@ export class UserController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   // @Roles(Role.SU_ADMIN)
   async findAll() {
     return { data: await this.userService.findAll() };

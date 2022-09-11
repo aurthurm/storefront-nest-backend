@@ -29,27 +29,29 @@ export class SubscriptionTypeController {
   ) {}
 
   @Post()
-  create(@Body() createSubscriptionTypeDto: CreateSubscriptionTypeDto) {
+  async create(@Body() createSubscriptionTypeDto: CreateSubscriptionTypeDto) {
     return {
-      data: this.subscriptionTypeService.create(createSubscriptionTypeDto),
+      data: await this.subscriptionTypeService.create(
+        createSubscriptionTypeDto,
+      ),
     };
   }
 
   @Get()
-  findAll() {
-    return { data: this.subscriptionTypeService.findAll() };
+  async findAll() {
+    return { data: await this.subscriptionTypeService.findAll() };
   }
 
   @Get('filter')
-  filter(
+  async filter(
     @Query(new ValidationPipe(SubscriptionTypeProperties)) collectionDto: any,
   ): Promise<CollectionResponse<SubscriptionTypeDocument>> {
-    return this.subscriptionTypeService.filter(collectionDto);
+    return await this.subscriptionTypeService.filter(collectionDto);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.subscriptionTypeService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return { data: await this.subscriptionTypeService.findOne(id) };
   }
 
   @Patch(':id')

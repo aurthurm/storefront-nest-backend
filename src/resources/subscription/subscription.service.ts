@@ -1,3 +1,7 @@
+import {
+  CollectionResponse,
+  DocumentCollector,
+} from '@forlagshuset/nestjs-mongoose-paginate';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -21,6 +25,15 @@ export class SubscriptionService {
 
   async findAll(query = {}) {
     return await this.subscriptionModel.find(query);
+  }
+
+  async filter(
+    collectionDto: any,
+  ): Promise<CollectionResponse<SubscriptionDocument>> {
+    const collector = new DocumentCollector<SubscriptionDocument>(
+      this.subscriptionModel,
+    );
+    return collector.find(collectionDto);
   }
 
   async findOne(id: string) {

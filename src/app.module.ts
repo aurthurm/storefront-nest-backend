@@ -22,10 +22,12 @@ import { ExchangeRateModule } from './resources/exchange-rate/exchange-rate.modu
 import { AppInitService } from './providers/initialiser';
 import { AccountModule } from './resources/account/account.module';
 import { TransactionModule } from './resources/transaction/transaction.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
     ConfigModule.forRoot(),
+    ScheduleModule.forRoot(),
     MongooseModule.forRoot(`mongodb://${process.env.DATABASE_URL}/storefront`),
     MailerModule.forRoot({
       transport: {
@@ -75,4 +77,4 @@ import { TransactionModule } from './resources/transaction/transaction.module';
     AppInitService,
   ],
 })
-export class AppModule { }
+export class AppModule {}
