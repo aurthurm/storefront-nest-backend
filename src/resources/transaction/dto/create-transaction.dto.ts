@@ -17,5 +17,8 @@ export class CreateTransactionDto {
   reference: string;
 
   @ApiProperty()
+  status: string;
+
+  @ApiProperty()
   user: string;
 }

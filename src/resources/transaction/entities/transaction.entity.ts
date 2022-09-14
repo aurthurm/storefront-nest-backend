@@ -23,6 +23,9 @@ export class Transaction {
   reference: string;
 
   @Prop()
+  status: string;
+
+  @Prop()
   user: string;
 
   @Prop({ type: Subscription })

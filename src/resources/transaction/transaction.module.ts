@@ -5,6 +5,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Transaction, TransactionSchema } from './entities/transaction.entity';
 import { PaynowService } from 'src/providers/paynow/paynow/paynow.service';
 import { HttpModule } from '@nestjs/axios';
+import { SubscriptionModule } from '../subscription/subscription.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { HttpModule } from '@nestjs/axios';
         maxRedirects: 5,
       }),
     }),
+    SubscriptionModule,
   ],
   controllers: [TransactionController],
   providers: [TransactionService, PaynowService],

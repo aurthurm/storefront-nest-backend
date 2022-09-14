@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Cron } from '@nestjs/schedule';
 import { Model } from 'mongoose';
 import { PaynowService } from 'src/providers/paynow/paynow/paynow.service';
+import { SubscriptionService } from '../subscription/subscription.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import {
@@ -18,6 +19,7 @@ export class TransactionService {
     @InjectModel(Transaction.name)
     private transactionModel: Model<TransactionDocument>,
     private paynowService: PaynowService,
+    private subscriptionService: SubscriptionService,
   ) {}
 
   async create(createTransactionDto: CreateTransactionDto) {
@@ -27,13 +29,19 @@ export class TransactionService {
     created.paynowResponse = sentToWeb;
     this.paynowService.pollUrl(created.paynowResponse?.pollUrl).subscribe({
       next: (response) => {
-        created.pollResults = this.paynowService.decodeUrlParams(response.data);
+        const data = this.paynowService.decodeUrlParams(response.data);
+        created.pollResults = data;
+        created.status = data.status;
+        created.reference = data.paynowreference;
         created.save();
       },
     });
-    return (
-      created.paynowResponse?.redirectUrl ?? created.paynowResponse.success
-    );
+    return {
+      success: created.paynowResponse.success,
+      paynow: {
+        redirectUrl: created.paynowResponse?.redirectUrl,
+      },
+    };
   }
 
   async findAll(query = {}) {
@@ -56,7 +64,30 @@ export class TransactionService {
   }
 
   @Cron('5 * * * * *')
-  handleCron() {
+  async handleCron() {
     this.logger.debug('Called when the current second is 45');
+    const data = await this.findAll({
+      $or: [{ status: 'Created' }, { status: 'Sent' }],
+    });
+    data.forEach((transaction) => {
+      this.paynowService
+        .pollUrl(transaction.paynowResponse?.pollUrl)
+        .subscribe({
+          next: async (response) => {
+            const res = this.paynowService.decodeUrlParams(response.data);
+            transaction.pollResults = res;
+            transaction.status = res.status;
+            transaction.save();
+            if (['Paid'].includes(res.status)) {
+              const { subscription } = transaction.toObject();
+              await this.subscriptionService.create({
+                ...subscription,
+                transactionId: transaction._id.toString(),
+              });
+            }
+          },
+          error: console.log,
+        });
+    });
   }
 }

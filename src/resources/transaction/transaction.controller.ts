@@ -16,13 +16,13 @@ export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 
   @Post()
-  create(@Body() createTransactionDto: CreateTransactionDto) {
-    return this.transactionService.create(createTransactionDto);
+  async create(@Body() createTransactionDto: CreateTransactionDto) {
+    return { data: await this.transactionService.create(createTransactionDto) };
   }
 
   @Get()
-  findAll() {
-    return this.transactionService.findAll();
+  async findAll() {
+    return { data: await this.transactionService.findAll() };
   }
 
   @Get(':id')
