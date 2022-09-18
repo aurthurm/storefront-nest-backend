@@ -15,5 +15,6 @@ import {
   ],
   controllers: [SubscriptionTypeController],
   providers: [SubscriptionTypeService],
+  exports: [SubscriptionTypeService],
 })
 export class SubscriptionTypeModule {}

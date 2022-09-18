@@ -12,6 +12,9 @@ export class CreateSubscriptionTypeDto {
   title: string;
 
   @ApiProperty()
+  days: number;
+
+  @ApiProperty()
   userType: string;
 
   @ApiProperty()

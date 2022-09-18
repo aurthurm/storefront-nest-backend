@@ -10,6 +10,8 @@ import { HttpModule } from '@nestjs/axios';
 import { ListingModule } from '../listing/listing.module';
 import { TenantModule } from '../tenant/tenant.module';
 import { LeaseModule } from '../lease/lease.module';
+import { SubscriptionTypeModule } from '../subscription-type/subscription-type.module';
+import { WhatsappService } from 'src/providers/whatsapp/whatsapp.service';
 
 @Module({
   imports: [
@@ -24,9 +26,10 @@ import { LeaseModule } from '../lease/lease.module';
     ListingModule,
     TenantModule,
     LeaseModule,
+    SubscriptionTypeModule,
   ],
   controllers: [BotController],
-  providers: [BotService, BotAccountService, SmsService],
+  providers: [BotService, BotAccountService, SmsService, WhatsappService],
 
   exports: [BotService],
 })

@@ -41,6 +41,25 @@ export class SubscriptionController {
     };
   }
 
+  @Get('active-subscription/:userId')
+  async getActiveSubscription(@Param('userId') userId: string) {
+    const query = {
+      $and: [
+        {
+          userId,
+          endDate: {
+            $gt: new Date(),
+          },
+        },
+      ],
+    };
+    const results = await this.subscriptionService.findAll(query, 1);
+
+    return {
+      data: results.length ? results[0] : null,
+    };
+  }
+
   @Get('filter')
   async filter(
     @Query(new ValidationPipe(SubscriptionProperties)) collectionDto: any,

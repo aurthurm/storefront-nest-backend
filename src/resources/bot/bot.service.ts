@@ -12,6 +12,9 @@ import { TenantService } from '../tenant/tenant.service';
 import { CreateTenantDto } from '../tenant/dto/create-tenant.dto';
 import { LeaseService } from '../lease/lease.service';
 import { CreateLeaseDto } from '../lease/dto/create-lease.dto';
+import { SubscriptionTypeService } from '../subscription-type/subscription-type.service';
+import { SubscriptionType } from '../subscription-type/entities/subscription-type.entity';
+import { WhatsappService } from 'src/providers/whatsapp/whatsapp.service';
 
 @Injectable()
 export class BotService {
@@ -23,9 +26,11 @@ export class BotService {
     @InjectModel(Bot.name) private readonly botModel: Model<Bot>,
     private botAccountService: BotAccountService,
     private smsService: SmsService,
+    private whatsappService: WhatsappService,
     private listingService: ListingService,
     private tenantService: TenantService,
     private leaseService: LeaseService,
+    private subscriptionTypeService: SubscriptionTypeService,
   ) {}
   //
 
@@ -738,7 +743,6 @@ export class BotService {
               await this.listingService.update(listing._id, listing);
 
               // send sms
-
               this.smsService.sendSMS(
                 [tenantDto.phoneNumber],
                 `Dear Tenant ID ${tenantDto.idNumber} please send Confirmation Code ${code} to your new Landlord to
@@ -825,7 +829,7 @@ export class BotService {
           });
       }
 
-      // TERMINATE_LEASE
+      // GET_SUBSCRIPTION
       case '2.5.1': {
         const {
           title,
@@ -833,20 +837,155 @@ export class BotService {
           validation,
           validationResponse,
           expectedResponses,
-        } = EnTranslations.TERMINATE_LEASE;
+        } = EnTranslations.GET_SUBSCRIPTION;
+
+        let subscriptionTypes =
+          (await this.subscriptionTypeService.findAll()) as any; //
+
+        this.updateBotSession({
+          'responses.subscription_types': subscriptionTypes,
+        });
+
+        subscriptionTypes = subscriptionTypes.map((subscriptionType, index) => {
+          return `${index + 1} ${subscriptionType.title}`;
+        });
+
+        return new BotMenuBuilder(
+          title,
+          subscriptionTypes,
+          '2',
+          '2.5.1',
+          '2.5.2',
+          validation,
+          validationResponse,
+          Array.from({ length: subscriptionTypes.length }, (_, i) => i + 1),
+        )
+          .get()
+          .setAction(async (selected: string) => {
+            const { responses } = (await this.getCurrentSession(
+              this.source,
+            )) as any;
+            const subscriptionType =
+              responses['subscription_types'][+selected - 1];
+
+            this.updateBotSession({
+              'responses.get_subscription_type': subscriptionType,
+            });
+            return {
+              notify: false,
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_SUBSCRIPTION_START_DATE
+      case '2.5.2': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_SUBSCRIPTION_START_DATE;
 
         return new BotMenuBuilder(
           title,
           options,
-          '2',
           '2.5.1',
-          '2',
+          '2.5.2',
+          '2.5.3',
           validation,
           validationResponse,
           expectedResponses,
         )
           .get()
-          .setAction((selected: string) => {
+          .setAction(async (startDate: string) => {
+            const { responses } = (await this.getCurrentSession(
+              this.source,
+            )) as any;
+            const subscriptionType = responses[
+              'get_subscription_type'
+            ] as SubscriptionType;
+
+            this.updateBotSession({
+              'responses.get_start_date': startDate,
+              'responses.get_end_date': this.calculateEndDate(
+                startDate,
+                subscriptionType?.days,
+              ),
+            });
+
+            return {
+              notify: false,
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_SUBSCRIPTION_START_DATE
+      case '2.5.3': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_PAYMENT_CURRENCY;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.5.2',
+          '2.5.3',
+          '2.5.4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (currency: string) => {
+            this.updateBotSession({
+              'responses.get_payment_currency': currency,
+            });
+            return {
+              notify: false,
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // GET_PAYMENT_METHOD
+      case '2.5.4': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.GET_PAYMENT_METHOD;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2.5.3',
+          '2.5.4',
+          '4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (method: string) => {
+            this.updateBotSession({
+              'responses.get_payment_method': method,
+            });
+            // TODO: implement payment methods [ecocash, paynow, cash, etc]
+            this.whatsappService
+              .send(this.source, 'To implement payment method')
+              .subscribe({ next: console.log, error: console.log });
             return {
               notify: false,
               success: true,
@@ -1212,5 +1351,12 @@ export class BotService {
       advertiserId: user._id,
       ...query,
     });
+  }
+
+  calculateEndDate(startDate: any, days: number): Date {
+    const result = new Date(startDate);
+    result.setDate(result.getDate() + days);
+    const ndate = new Date(result);
+    return ndate;
   }
 }

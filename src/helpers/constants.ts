@@ -123,8 +123,9 @@ export const EnTranslations = {
       '2. Remove / Delete Listing/s',
       '3. Change Reminder Frequency',
       '4. Ternant Services',
-      '5. End / Terminate Lease Subscribe',
-      '6. Support',
+      '5. Subscription Services',
+      '6. End / Terminate Lease Subscribe',
+      '7. Support',
     ],
     validation: new RegExp(/^[1-6]{1}$/),
     validationResponse:
@@ -336,6 +337,53 @@ export const EnTranslations = {
     children: [],
   },
 
+  GET_SUBSCRIPTION: {
+    title: 'Select a subscrition Type',
+    options: [],
+    validation: new RegExp(/^/),
+    validationResponse: '',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_SUBSCRIPTION_START_DATE: {
+    title: 'When do sould the subscription start?',
+    options: ['Enter date in format dd-mm-yyyy'],
+    validation: new RegExp(
+      /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
+    ),
+    validationResponse: 'Required Date Format: dd-mm-yyyy',
+    expectedResponses: [],
+    children: [],
+  },
+
+  GET_PAYMENT_CURRENCY: {
+    title: 'Select a payment currency',
+    options: ['1. USD', '2. ZWL'],
+    validation: new RegExp(/^[1-2]{1}/),
+    validationResponse: 'Please select 1 or 2',
+    expectedResponses: [1, 2],
+    children: [],
+  },
+
+  GET_PAYMENT_METHOD: {
+    title: 'Select a payment method',
+    options: ['1. CASH', '2. ECOCASH', '3. PAYNOW'],
+    validation: new RegExp(/^[1-3]{1}/),
+    validationResponse: 'Please select 1, 2 or 3',
+    expectedResponses: [1, 2, 3],
+    children: [],
+  },
+
+  GET_ECOCASH_NUMBER: {
+    title: 'Enter your ecocash number',
+    options: [],
+    validation: new RegExp(/^(263|0)7[7-8][0-9]{7}$/),
+    validationResponse: 'Invalid Ecoash Number',
+    expectedResponses: [1, 2, 3],
+    children: [],
+  },
+
   SUPPORT: {
     title: 'Leave a message ',
     options: ['One of our agents will contact you'],
@@ -389,7 +437,11 @@ const MENU_MAPPINGS = {
   '2.4.4': EnTranslations.CLEAR_TENANT,
   '2.4.5': EnTranslations.BLACKLIST_TENANT,
   '2.4.6': EnTranslations.TERMINATE_LEASE,
-  '2.5': EnTranslations.SUPPORT,
+  '2.5.1': EnTranslations.GET_SUBSCRIPTION,
+  '2.5.2': EnTranslations.GET_SUBSCRIPTION_START_DATE,
+  '2.5.3': EnTranslations.GET_PAYMENT_METHOD,
+  '2.5.4': EnTranslations.GET_ECOCASH_NUMBER,
+  '2.6': EnTranslations.SUPPORT,
   '3': EnTranslations.REGISTRATION_MENU,
   '3.1.1': 'Activation',
   '3.2.1': EnTranslations.CONFIRM_PHONE_MENU,

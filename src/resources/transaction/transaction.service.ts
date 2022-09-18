@@ -3,7 +3,13 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Cron } from '@nestjs/schedule';
 import { Model } from 'mongoose';
 import { PaynowService } from 'src/providers/paynow/paynow/paynow.service';
+import { WhatsappService } from 'src/providers/whatsapp/whatsapp.service';
+import {
+  Subscription,
+  SubscriptionDocument,
+} from '../subscription/entities/subscription.entity';
 import { SubscriptionService } from '../subscription/subscription.service';
+import { UserService } from '../user/user.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import {
@@ -20,6 +26,8 @@ export class TransactionService {
     private transactionModel: Model<TransactionDocument>,
     private paynowService: PaynowService,
     private subscriptionService: SubscriptionService,
+    private whatsappService: WhatsappService,
+    private userService: UserService,
   ) {}
 
   async create(createTransactionDto: CreateTransactionDto) {
@@ -80,14 +88,27 @@ export class TransactionService {
             transaction.save();
             if (['Paid'].includes(res.status)) {
               const { subscription } = transaction.toObject();
-              await this.subscriptionService.create({
+              const sub = await this.subscriptionService.create({
                 ...subscription,
                 transactionId: transaction._id.toString(),
               });
+              await sub.populate(['userId', 'subscriptionType']);
+              console.log(sub);
+              await this.sendPaymentNotification(sub);
             }
           },
           error: console.log,
         });
+    });
+  }
+
+  async sendPaymentNotification(subscription: Subscription | any) {
+    const user = await this.userService.findOne(subscription.userId);
+    const message = `Your ${
+      subscription.subscriptionType?.title
+    } subscription starting ${subscription.startDate.toISOString()} is successful`;
+    this.whatsappService.send(user.waBotPhone, message).subscribe({
+      next: (res) => console.log,
     });
   }
 }

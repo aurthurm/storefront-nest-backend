@@ -6,6 +6,8 @@ import { Transaction, TransactionSchema } from './entities/transaction.entity';
 import { PaynowService } from 'src/providers/paynow/paynow/paynow.service';
 import { HttpModule } from '@nestjs/axios';
 import { SubscriptionModule } from '../subscription/subscription.module';
+import { WhatsappService } from 'src/providers/whatsapp/whatsapp.service';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -19,8 +21,9 @@ import { SubscriptionModule } from '../subscription/subscription.module';
       }),
     }),
     SubscriptionModule,
+    UserModule,
   ],
   controllers: [TransactionController],
-  providers: [TransactionService, PaynowService],
+  providers: [TransactionService, PaynowService, WhatsappService],
 })
 export class TransactionModule {}
