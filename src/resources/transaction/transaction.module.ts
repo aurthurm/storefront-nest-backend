@@ -25,5 +25,6 @@ import { UserModule } from '../user/user.module';
   ],
   controllers: [TransactionController],
   providers: [TransactionService, PaynowService, WhatsappService],
+  exports: [TransactionService],
 })
 export class TransactionModule {}

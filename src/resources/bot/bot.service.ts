@@ -15,6 +15,7 @@ import { CreateLeaseDto } from '../lease/dto/create-lease.dto';
 import { SubscriptionTypeService } from '../subscription-type/subscription-type.service';
 import { SubscriptionType } from '../subscription-type/entities/subscription-type.entity';
 import { WhatsappService } from 'src/providers/whatsapp/whatsapp.service';
+import { TransactionService } from '../transaction/transaction.service';
 
 @Injectable()
 export class BotService {
@@ -31,6 +32,7 @@ export class BotService {
     private tenantService: TenantService,
     private leaseService: LeaseService,
     private subscriptionTypeService: SubscriptionTypeService,
+    private transactionService: TransactionService,
   ) {}
   //
 
@@ -982,10 +984,39 @@ export class BotService {
             this.updateBotSession({
               'responses.get_payment_method': method,
             });
-            // TODO: implement payment methods [ecocash, paynow, cash, etc]
-            this.whatsappService
-              .send(this.source, 'To implement payment method')
-              .subscribe({ next: console.log, error: console.log });
+
+            const { responses } = (await this.getCurrentSession(
+              this.source,
+            )) as any;
+
+            const subscriptionType = responses[
+              'get_subscription_type'
+            ] as SubscriptionType;
+
+            const user = await this.botAccountService.getAccount(this.source);
+
+            // transactionService
+            const transaction = this.transactionService.create(
+              {
+                amount: subscriptionType.price,
+                transactionType: ['CASH', 'ECOCASH', 'PAYNOW'][+method - 1],
+                description: '',
+                currency: ['USD', 'ZWL'][
+                  +responses['get_payment_currency'] - 1
+                ],
+                phone: this.source,
+                reference: '',
+                user: user._id,
+                subscription: {
+                  userId: user._id,
+                  subscriptionType: (subscriptionType as any)?._id,
+                  startDate: responses['get_start_date'],
+                  endDate: responses['get_end_date'],
+                },
+              } as any,
+              this.source,
+            );
+
             return {
               notify: false,
               success: true,

@@ -12,6 +12,7 @@ import { TenantModule } from '../tenant/tenant.module';
 import { LeaseModule } from '../lease/lease.module';
 import { SubscriptionTypeModule } from '../subscription-type/subscription-type.module';
 import { WhatsappService } from 'src/providers/whatsapp/whatsapp.service';
+import { TransactionModule } from '../transaction/transaction.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { WhatsappService } from 'src/providers/whatsapp/whatsapp.service';
     TenantModule,
     LeaseModule,
     SubscriptionTypeModule,
+    TransactionModule,
   ],
   controllers: [BotController],
   providers: [BotService, BotAccountService, SmsService, WhatsappService],

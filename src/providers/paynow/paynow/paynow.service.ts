@@ -12,8 +12,7 @@ export class PaynowService {
 
   constructor(private readonly httpService: HttpService) {
     this.paynow.resultUrl = 'http://example.com/gateways/paynow/update';
-    this.paynow.returnUrl =
-      'http://example.com/return?gateway=paynow&merchantReference=1234';
+    this.paynow.returnUrl = 'https://wa.me/263713069794';
   }
 
   createPayment() {

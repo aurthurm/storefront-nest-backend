@@ -30,20 +30,54 @@ export class TransactionService {
     private userService: UserService,
   ) {}
 
-  async create(createTransactionDto: CreateTransactionDto) {
+  async create(createTransactionDto: CreateTransactionDto, phone = null) {
     const created = await this.transactionModel.create(createTransactionDto);
-    const payment = this.paynowService.createPayment();
-    const sentToWeb = await this.paynowService.sendToWeb(payment);
-    created.paynowResponse = sentToWeb;
-    this.paynowService.pollUrl(created.paynowResponse?.pollUrl).subscribe({
-      next: (response) => {
-        const data = this.paynowService.decodeUrlParams(response.data);
-        created.pollResults = data;
-        created.status = data.status;
-        created.reference = data.paynowreference;
-        created.save();
-      },
-    });
+
+    switch (created.transactionType.toLowerCase()) {
+      case 'ecocash':
+        phone &&
+          this.whatsappService
+            .send(phone, `Please check your phone for an ecocash dialog`)
+            .subscribe({ next: console.log, error: console.log });
+        break;
+
+      case 'paynow':
+        {
+          const payment = this.paynowService.createPayment();
+          const sentToWeb = await this.paynowService.sendToWeb(payment);
+          created.paynowResponse = sentToWeb;
+          this.paynowService
+            .pollUrl(created.paynowResponse?.pollUrl)
+            .subscribe({
+              next: (response) => {
+                const data = this.paynowService.decodeUrlParams(response.data);
+                created.pollResults = data;
+                created.status = data.status;
+                created.reference = data.paynowreference;
+                created.save();
+                phone &&
+                  this.whatsappService
+                    .send(
+                      phone,
+                      `Please click the following link to pay: ${created.paynowResponse?.redirectUrl}`,
+                    )
+                    .subscribe({ next: console.log, error: console.log });
+              },
+            });
+        }
+        break;
+
+      default:
+        phone &&
+          this.whatsappService
+            .send(
+              phone,
+              `Your subscription is pending. Please proceed to our cash office`,
+            )
+            .subscribe({ next: console.log, error: console.log });
+        break;
+    }
+
     return {
       success: created.paynowResponse.success,
       paynow: {
