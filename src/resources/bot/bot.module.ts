@@ -19,7 +19,7 @@ import { TransactionModule } from '../transaction/transaction.module';
     MongooseModule.forFeature([{ name: Bot.name, schema: BotSchema }]),
     HttpModule.registerAsync({
       useFactory: () => ({
-        timeout: 5000,
+        timeout: 15000,
         maxRedirects: 5,
       }),
     }),
