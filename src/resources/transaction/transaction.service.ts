@@ -37,7 +37,7 @@ export class TransactionService {
       case 'ecocash':
         phone &&
           this.whatsappService
-            .send(phone, `Please check your phone for an ecocash dialog`)
+            .send(phone, `Please check your phone for an ecocash dialog to complete payment`)
             .subscribe({ next: console.log, error: console.log });
         break;
 

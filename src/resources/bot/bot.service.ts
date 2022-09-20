@@ -1078,7 +1078,12 @@ export class BotService {
           expectedResponses,
         )
           .get()
-          .setAction(async (method: string) => {
+          .setAction(async (message: string) => {
+
+            this.whatsappService
+              .send('263787270066', `Message from ${this.source} : ${message}`)
+              .subscribe({ next: console.log, error: console.log });
+
 
             return {
               notify: false,
@@ -1310,6 +1315,10 @@ export class BotService {
         )
           .get()
           .setAction(async (message: string) => {
+
+            this.whatsappService
+            .send('263787270066', `Message from ${this.source} : ${message}`)
+            .subscribe({ next: console.log, error: console.log });
             return {
               notify: false,
               success: true,

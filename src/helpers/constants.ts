@@ -127,10 +127,10 @@ export const EnTranslations = {
       '6. End / Terminate Lease Subscribe',
       '7. Support',
     ],
-    validation: new RegExp(/^[1-6]{1}$/),
+    validation: new RegExp(/^[1-7]{1}$/),
     validationResponse:
-      'Please choose one of the following options: 1,2,3,4,5,6',
-    expectedResponses: [1, 2, 3, 4, 5, 6],
+      'Please choose one of the following options: 1-7',
+    expectedResponses: [1, 2, 3, 4, 5, 6, 7],
     children: [],
   },
 
