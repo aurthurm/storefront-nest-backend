@@ -33,7 +33,7 @@ export class BotService {
     private leaseService: LeaseService,
     private subscriptionTypeService: SubscriptionTypeService,
     private transactionService: TransactionService,
-  ) {}
+  ) { }
   //
 
   async getWhatsAppResponse(source: string, message: string) {
@@ -228,9 +228,8 @@ export class BotService {
 
         const toReadableDate = (d) => new Date(d).toLocaleDateString();
         const options2 = (await this.getListings()).map((listing, i) => {
-          return `${listing.listingReference}. ${listing.listingReference} ${
-            listing.address
-          } valid until ${toReadableDate(listing.expirationDate)}`;
+          return `${listing.listingReference}. ${listing.listingReference} ${listing.address
+            } valid until ${toReadableDate(listing.expirationDate)}`;
         });
 
         return new BotMenuBuilder(
@@ -581,9 +580,8 @@ export class BotService {
 
         const listingRefs = listings.map((listing) => listing.listingReference);
         const options2 = listings.map((listing) => {
-          return `${listing.listingReference}. ${listing.listingReference} ${
-            listing.address
-          } valid until ${toReadableDate(listing.expirationDate)}`;
+          return `${listing.listingReference}. ${listing.listingReference} ${listing.address
+            } valid until ${toReadableDate(listing.expirationDate)}`;
         });
 
         return new BotMenuBuilder(
@@ -903,6 +901,9 @@ export class BotService {
         )
           .get()
           .setAction(async (startDate: string) => {
+
+            let _startDate = this.convertToDate(startDate);
+
             const { responses } = (await this.getCurrentSession(
               this.source,
             )) as any;
@@ -911,9 +912,9 @@ export class BotService {
             ] as SubscriptionType;
 
             this.updateBotSession({
-              'responses.get_start_date': startDate,
+              'responses.get_start_date': _startDate,
               'responses.get_end_date': this.calculateEndDate(
-                startDate,
+                _startDate,
                 subscriptionType?.days,
               ),
             });
@@ -1016,6 +1017,68 @@ export class BotService {
               } as any,
               this.source,
             );
+
+            return {
+              notify: false,
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // TERMINATE LEASE
+      case '2.6.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.TERMINATE_LEASE;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2',
+          '2.6.1',
+          '4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (method: string) => {
+
+            return {
+              notify: false,
+              success: true,
+              message: '',
+            };
+          });
+      }
+
+      // SUPPORT
+      case '2.7.1': {
+        const {
+          title,
+          options,
+          validation,
+          validationResponse,
+          expectedResponses,
+        } = EnTranslations.SUPPORT;
+
+        return new BotMenuBuilder(
+          title,
+          options,
+          '2',
+          '2.7.1',
+          '4',
+          validation,
+          validationResponse,
+          expectedResponses,
+        )
+          .get()
+          .setAction(async (method: string) => {
 
             return {
               notify: false,
@@ -1382,6 +1445,14 @@ export class BotService {
       advertiserId: user._id,
       ...query,
     });
+  }
+
+
+  convertToDate(dateString) {
+    //  Convert a "dd-MM-yyyy" string into a Date object
+    let d = dateString.split("-");
+    let dat = new Date(d[2] + '/' + d[1] + '/' + d[0]);
+    return dat;
   }
 
   calculateEndDate(startDate: any, days: number): Date {

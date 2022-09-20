@@ -338,7 +338,7 @@ export const EnTranslations = {
   },
 
   GET_SUBSCRIPTION: {
-    title: 'Select a subscrition Type',
+    title: 'Select a subscription Type',
     options: [],
     validation: new RegExp(/^/),
     validationResponse: '',
@@ -347,7 +347,7 @@ export const EnTranslations = {
   },
 
   GET_SUBSCRIPTION_START_DATE: {
-    title: 'When do sould the subscription start?',
+    title: 'When do should the subscription start?',
     options: ['Enter date in format dd-mm-yyyy'],
     validation: new RegExp(
       /^(0?[1-9]|[12][0-9]|3[01])[\/\-](0?[1-9]|1[012])[\/\-]\d{4}$/,
