@@ -1084,6 +1084,10 @@ export class BotService {
               .send('263787270066', `Message from ${this.source} : ${message}`)
               .subscribe({ next: console.log, error: console.log });
 
+            this.whatsappService
+              .send(this.source, `Message sent to one of our agents`)
+              .subscribe({ next: console.log, error: console.log });
+
 
             return {
               notify: false,
@@ -1317,8 +1321,13 @@ export class BotService {
           .setAction(async (message: string) => {
 
             this.whatsappService
-            .send('263787270066', `Message from ${this.source} : ${message}`)
-            .subscribe({ next: console.log, error: console.log });
+              .send('263787270066', `Message from ${this.source} : ${message}`)
+              .subscribe({ next: console.log, error: console.log });
+
+
+            this.whatsappService
+              .send(this.source, `Message sent to one of our agents`)
+              .subscribe({ next: console.log, error: console.log });
             return {
               notify: false,
               success: true,
